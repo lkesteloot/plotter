@@ -1,0 +1,422 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		4AF812571B61C0BC00BF23C1 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4AF812561B61C0BC00BF23C1 /* AppDelegate.m */; };
+		4AF812591B61C0BC00BF23C1 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 4AF812581B61C0BC00BF23C1 /* main.m */; };
+		4AF8125C1B61C0BC00BF23C1 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4AF8125B1B61C0BC00BF23C1 /* ViewController.m */; };
+		4AF8125E1B61C0BC00BF23C1 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4AF8125D1B61C0BC00BF23C1 /* Images.xcassets */; };
+		4AF812611B61C0BC00BF23C1 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4AF8125F1B61C0BC00BF23C1 /* Main.storyboard */; };
+		4AF8126D1B61C0BD00BF23C1 /* PlotterTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4AF8126C1B61C0BD00BF23C1 /* PlotterTests.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		4AF812671B61C0BD00BF23C1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4AF812481B61C0BC00BF23C1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4AF8124F1B61C0BC00BF23C1;
+			remoteInfo = Plotter;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		4AF812501B61C0BC00BF23C1 /* Plotter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Plotter.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4AF812541B61C0BC00BF23C1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		4AF812551B61C0BC00BF23C1 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		4AF812561B61C0BC00BF23C1 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		4AF812581B61C0BC00BF23C1 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		4AF8125A1B61C0BC00BF23C1 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		4AF8125B1B61C0BC00BF23C1 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		4AF8125D1B61C0BC00BF23C1 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		4AF812601B61C0BC00BF23C1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		4AF812661B61C0BD00BF23C1 /* PlotterTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PlotterTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		4AF8126B1B61C0BD00BF23C1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		4AF8126C1B61C0BD00BF23C1 /* PlotterTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PlotterTests.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		4AF8124D1B61C0BC00BF23C1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4AF812631B61C0BD00BF23C1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		4AF812471B61C0BC00BF23C1 = {
+			isa = PBXGroup;
+			children = (
+				4AF812521B61C0BC00BF23C1 /* Plotter */,
+				4AF812691B61C0BD00BF23C1 /* PlotterTests */,
+				4AF812511B61C0BC00BF23C1 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		4AF812511B61C0BC00BF23C1 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				4AF812501B61C0BC00BF23C1 /* Plotter.app */,
+				4AF812661B61C0BD00BF23C1 /* PlotterTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		4AF812521B61C0BC00BF23C1 /* Plotter */ = {
+			isa = PBXGroup;
+			children = (
+				4AF812551B61C0BC00BF23C1 /* AppDelegate.h */,
+				4AF812561B61C0BC00BF23C1 /* AppDelegate.m */,
+				4AF8125A1B61C0BC00BF23C1 /* ViewController.h */,
+				4AF8125B1B61C0BC00BF23C1 /* ViewController.m */,
+				4AF8125D1B61C0BC00BF23C1 /* Images.xcassets */,
+				4AF8125F1B61C0BC00BF23C1 /* Main.storyboard */,
+				4AF812531B61C0BC00BF23C1 /* Supporting Files */,
+			);
+			path = Plotter;
+			sourceTree = "<group>";
+		};
+		4AF812531B61C0BC00BF23C1 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				4AF812541B61C0BC00BF23C1 /* Info.plist */,
+				4AF812581B61C0BC00BF23C1 /* main.m */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		4AF812691B61C0BD00BF23C1 /* PlotterTests */ = {
+			isa = PBXGroup;
+			children = (
+				4AF8126C1B61C0BD00BF23C1 /* PlotterTests.m */,
+				4AF8126A1B61C0BD00BF23C1 /* Supporting Files */,
+			);
+			path = PlotterTests;
+			sourceTree = "<group>";
+		};
+		4AF8126A1B61C0BD00BF23C1 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				4AF8126B1B61C0BD00BF23C1 /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		4AF8124F1B61C0BC00BF23C1 /* Plotter */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4AF812701B61C0BD00BF23C1 /* Build configuration list for PBXNativeTarget "Plotter" */;
+			buildPhases = (
+				4AF8124C1B61C0BC00BF23C1 /* Sources */,
+				4AF8124D1B61C0BC00BF23C1 /* Frameworks */,
+				4AF8124E1B61C0BC00BF23C1 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Plotter;
+			productName = Plotter;
+			productReference = 4AF812501B61C0BC00BF23C1 /* Plotter.app */;
+			productType = "com.apple.product-type.application";
+		};
+		4AF812651B61C0BD00BF23C1 /* PlotterTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4AF812731B61C0BD00BF23C1 /* Build configuration list for PBXNativeTarget "PlotterTests" */;
+			buildPhases = (
+				4AF812621B61C0BD00BF23C1 /* Sources */,
+				4AF812631B61C0BD00BF23C1 /* Frameworks */,
+				4AF812641B61C0BD00BF23C1 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				4AF812681B61C0BD00BF23C1 /* PBXTargetDependency */,
+			);
+			name = PlotterTests;
+			productName = PlotterTests;
+			productReference = 4AF812661B61C0BD00BF23C1 /* PlotterTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		4AF812481B61C0BC00BF23C1 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0640;
+				ORGANIZATIONNAME = HeadCode;
+				TargetAttributes = {
+					4AF8124F1B61C0BC00BF23C1 = {
+						CreatedOnToolsVersion = 6.4;
+					};
+					4AF812651B61C0BD00BF23C1 = {
+						CreatedOnToolsVersion = 6.4;
+						TestTargetID = 4AF8124F1B61C0BC00BF23C1;
+					};
+				};
+			};
+			buildConfigurationList = 4AF8124B1B61C0BC00BF23C1 /* Build configuration list for PBXProject "Plotter" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 4AF812471B61C0BC00BF23C1;
+			productRefGroup = 4AF812511B61C0BC00BF23C1 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				4AF8124F1B61C0BC00BF23C1 /* Plotter */,
+				4AF812651B61C0BD00BF23C1 /* PlotterTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		4AF8124E1B61C0BC00BF23C1 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4AF8125E1B61C0BC00BF23C1 /* Images.xcassets in Resources */,
+				4AF812611B61C0BC00BF23C1 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4AF812641B61C0BD00BF23C1 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		4AF8124C1B61C0BC00BF23C1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4AF8125C1B61C0BC00BF23C1 /* ViewController.m in Sources */,
+				4AF812591B61C0BC00BF23C1 /* main.m in Sources */,
+				4AF812571B61C0BC00BF23C1 /* AppDelegate.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4AF812621B61C0BD00BF23C1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4AF8126D1B61C0BD00BF23C1 /* PlotterTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		4AF812681B61C0BD00BF23C1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4AF8124F1B61C0BC00BF23C1 /* Plotter */;
+			targetProxy = 4AF812671B61C0BD00BF23C1 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		4AF8125F1B61C0BC00BF23C1 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				4AF812601B61C0BC00BF23C1 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		4AF8126E1B61C0BD00BF23C1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		4AF8126F1B61C0BD00BF23C1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		4AF812711B61C0BD00BF23C1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = Plotter/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		4AF812721B61C0BD00BF23C1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = Plotter/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		4AF812741B61C0BD00BF23C1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(inherited)",
+				);
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = PlotterTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Plotter.app/Contents/MacOS/Plotter";
+			};
+			name = Debug;
+		};
+		4AF812751B61C0BD00BF23C1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = PlotterTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Plotter.app/Contents/MacOS/Plotter";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		4AF8124B1B61C0BC00BF23C1 /* Build configuration list for PBXProject "Plotter" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4AF8126E1B61C0BD00BF23C1 /* Debug */,
+				4AF8126F1B61C0BD00BF23C1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4AF812701B61C0BD00BF23C1 /* Build configuration list for PBXNativeTarget "Plotter" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4AF812711B61C0BD00BF23C1 /* Debug */,
+				4AF812721B61C0BD00BF23C1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		4AF812731B61C0BD00BF23C1 /* Build configuration list for PBXNativeTarget "PlotterTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4AF812741B61C0BD00BF23C1 /* Debug */,
+				4AF812751B61C0BD00BF23C1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 4AF812481B61C0BC00BF23C1 /* Project object */;
+}
