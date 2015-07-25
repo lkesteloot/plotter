@@ -10,4 +10,14 @@
 
 @interface Data : NSObject
 
+// Array of NSMutableArray of NSNumber.
+@property (nonatomic) NSMutableArray *rows;
+@property (nonatomic,readonly) NSUInteger rowCount;
+
+- (void)newRow;
+- (void)newValue:(double)value;
+
+- (NSUInteger)columnsForRow:(NSUInteger)rowIndex;
+- (double)valueAtRow:(NSUInteger)rowIndex andColumn:(NSUInteger)columnIndex;
+
 @end

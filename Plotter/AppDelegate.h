@@ -7,6 +7,9 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import "Data.h"
+
+extern NSString *NEW_DATA_NOTIFICATION;
 
 @interface AppDelegate : NSObject <NSApplicationDelegate>
 

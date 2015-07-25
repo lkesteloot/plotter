@@ -13,6 +13,8 @@
 		4AF8125E1B61C0BC00BF23C1 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4AF8125D1B61C0BC00BF23C1 /* Images.xcassets */; };
 		4AF812611B61C0BC00BF23C1 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4AF8125F1B61C0BC00BF23C1 /* Main.storyboard */; };
 		4AF8126D1B61C0BD00BF23C1 /* PlotterTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4AF8126C1B61C0BD00BF23C1 /* PlotterTests.m */; };
+		4AF812781B62020C00BF23C1 /* PlotView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4AF812771B62020C00BF23C1 /* PlotView.m */; };
+		4AF8127B1B62076B00BF23C1 /* Data.m in Sources */ = {isa = PBXBuildFile; fileRef = 4AF8127A1B62076B00BF23C1 /* Data.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -38,6 +40,10 @@
 		4AF812661B61C0BD00BF23C1 /* PlotterTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PlotterTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4AF8126B1B61C0BD00BF23C1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4AF8126C1B61C0BD00BF23C1 /* PlotterTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PlotterTests.m; sourceTree = "<group>"; };
+		4AF812761B62020C00BF23C1 /* PlotView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlotView.h; sourceTree = "<group>"; };
+		4AF812771B62020C00BF23C1 /* PlotView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PlotView.m; sourceTree = "<group>"; };
+		4AF812791B62076B00BF23C1 /* Data.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Data.h; sourceTree = "<group>"; };
+		4AF8127A1B62076B00BF23C1 /* Data.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Data.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -86,6 +92,10 @@
 				4AF8125D1B61C0BC00BF23C1 /* Images.xcassets */,
 				4AF8125F1B61C0BC00BF23C1 /* Main.storyboard */,
 				4AF812531B61C0BC00BF23C1 /* Supporting Files */,
+				4AF812761B62020C00BF23C1 /* PlotView.h */,
+				4AF812771B62020C00BF23C1 /* PlotView.m */,
+				4AF812791B62076B00BF23C1 /* Data.h */,
+				4AF8127A1B62076B00BF23C1 /* Data.m */,
 			);
 			path = Plotter;
 			sourceTree = "<group>";
@@ -215,9 +225,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4AF8127B1B62076B00BF23C1 /* Data.m in Sources */,
 				4AF8125C1B61C0BC00BF23C1 /* ViewController.m in Sources */,
 				4AF812591B61C0BC00BF23C1 /* main.m in Sources */,
 				4AF812571B61C0BC00BF23C1 /* AppDelegate.m in Sources */,
+				4AF812781B62020C00BF23C1 /* PlotView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

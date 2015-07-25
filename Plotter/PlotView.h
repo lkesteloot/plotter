@@ -7,7 +7,10 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import "Data.h"
 
 @interface PlotView : NSView
+
+@property (nonatomic) Data *data;
 
 @end

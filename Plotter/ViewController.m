@@ -7,19 +7,40 @@
 //
 
 #import "ViewController.h"
+#import "PlotView.h"
+#import "AppDelegate.h"
+
+@interface ViewController ()
+
+// Override with more specific type.
+@property (nonatomic) PlotView *view;
+
+@end
+
 
 @implementation ViewController
 
-- (void)viewDidLoad {
-	[super viewDidLoad];
+@dynamic view;
 
-	// Do any additional setup after loading the view.
+- (void)viewDidLoad {
+    [super viewDidLoad];
+
+    [[NSNotificationCenter defaultCenter] addObserver:self
+					     selector:@selector(dataChanged:)
+						 name:NEW_DATA_NOTIFICATION
+					       object:nil];
+
 }
 
 - (void)setRepresentedObject:(id)representedObject {
-	[super setRepresentedObject:representedObject];
+    [super setRepresentedObject:representedObject];
+    
+    // Update the view, if already loaded.
+}
 
-	// Update the view, if already loaded.
+- (void)dataChanged:(NSNotification *)notification {
+    Data *data = notification.object;
+    self.view.data = data;
 }
 
 @end
