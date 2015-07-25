@@ -17,12 +17,6 @@
     NSColor *_majorGridColor;
     NSColor *_minorGridColor;
     NSArray *_plotColors;
-    
-    double _minValue;
-    double _maxValue;
-    double _range;
-    NSUInteger _rowCount;
-    NSUInteger _columnCount;
 }
 
 @end
@@ -33,14 +27,11 @@
 
 - (void)awakeFromNib {
     _data = nil;
-    _minValue = 0;
-    _maxValue = 0;
-    _range = 0;
     
     _backgroundColor = [NSColor colorWithRed:0.2 green:0.18 blue:0.14 alpha:1.0];
     _axisColor = [_backgroundColor blendedColorWithFraction:0.2 ofColor:[NSColor whiteColor]];
     _majorGridColor = [_backgroundColor blendedColorWithFraction:0.1 ofColor:[NSColor whiteColor]];
-    _minorGridColor = [_backgroundColor blendedColorWithFraction:0.02 ofColor:[NSColor whiteColor]];
+    _minorGridColor = [_backgroundColor blendedColorWithFraction:0.03 ofColor:[NSColor whiteColor]];
     
     NSMutableArray *plotColors = [NSMutableArray array];
     [plotColors addObject:[_backgroundColor blendedColorWithFraction:0.4 ofColor:[NSColor greenColor]]];
@@ -57,47 +48,21 @@
 
 - (void)setData:(Data *)data {
     _data = data;
-    
-    [self calibrateData];
-    
+
     // Redraw.
     [self setNeedsDisplay:YES];
 }
 
-- (void)calibrateData {
-    _rowCount = self.data.rowCount;
-    _minValue = 0;
-    _maxValue = 0;
-    _columnCount = 0;
-    BOOL firstValue = YES;
-
-    for (NSUInteger rowIndex = 0; rowIndex < _rowCount; rowIndex++) {
-	NSUInteger rowColumnCount = [self.data columnsForRow:rowIndex];
-	if (rowColumnCount > _columnCount) {
-	    _columnCount = rowColumnCount;
-	}
-	for (NSUInteger columnIndex = 0; columnIndex < rowColumnCount; columnIndex++) {
-	    double value = [self.data valueAtRow:rowIndex andColumn:columnIndex];
-	    if (value > _maxValue || firstValue) {
-		_maxValue = value;
-	    }
-	    if (value < _minValue || firstValue) {
-		_minValue = value;
-	    }
-	    
-	    firstValue = NO;
-	}
-    }
-    _range = _maxValue - _minValue;
-}
 
 - (void)drawRect:(NSRect)rect {
     [super drawRect:rect];
 
-    if (_data == nil || _range == 0) {
+    if (_data == nil || _data.seriesCount == 0 || _data.dataPointCount == 0) {
 	// XXX Draw something.
 	return;
     }
+    
+    Axis *axis = _data.axis;
 
     // Plot rectangle.
     NSRect plotRect = [self bounds];
@@ -111,54 +76,55 @@
     NSRectFill(rect);
     
     // Grid.
+    double gridSpacing = 1;
     [_minorGridColor set];
-    double y = floor(_minValue*10)/10;
-    double lastY = ceil(_maxValue*10)/10;
+    double y = floor(axis.minValue/gridSpacing)*gridSpacing;
+    double lastY = ceil(axis.maxValue/gridSpacing)*gridSpacing;
     while (y <= lastY) {
-	NSBezierPath *axis = [NSBezierPath bezierPath];
-	CGFloat axisY = plotRect.origin.y + (y - _minValue)/_range*plotRect.size.height;
-	[axis moveToPoint:NSMakePoint(plotRect.origin.x, axisY)];
-	[axis lineToPoint:NSMakePoint(plotRect.origin.x + plotRect.size.width, axisY)];
-	[axis setLineWidth:1.0];
-	[axis stroke];
-	y += 0.1;
+	NSBezierPath *grid = [NSBezierPath bezierPath];
+	CGFloat axisY = plotRect.origin.y + (y - axis.minValue)/axis.range*plotRect.size.height;
+	[grid moveToPoint:NSMakePoint(plotRect.origin.x, axisY)];
+	[grid lineToPoint:NSMakePoint(plotRect.origin.x + plotRect.size.width, axisY)];
+	[grid setLineWidth:1.0];
+	[grid stroke];
+	y += gridSpacing;
     }
     
     // Axes.
     [_axisColor set];
-    NSBezierPath *axis = [NSBezierPath bezierPath];
-    [axis moveToPoint:NSMakePoint(plotRect.origin.x, plotRect.origin.y + plotRect.size.height)];
-    [axis lineToPoint:NSMakePoint(plotRect.origin.x, plotRect.origin.y)];
-    CGFloat axisY = plotRect.origin.y - _minValue/_range*plotRect.size.height;
-    [axis moveToPoint:NSMakePoint(plotRect.origin.x, axisY)];
-    [axis lineToPoint:NSMakePoint(plotRect.origin.x + plotRect.size.width, axisY)];
-    [axis setLineWidth:1.0];
-    [axis stroke];
+    NSBezierPath *axisPath = [NSBezierPath bezierPath];
+    [axisPath moveToPoint:NSMakePoint(plotRect.origin.x, plotRect.origin.y + plotRect.size.height)];
+    [axisPath lineToPoint:NSMakePoint(plotRect.origin.x, plotRect.origin.y)];
+    CGFloat axisY = plotRect.origin.y - axis.minValue/axis.range*plotRect.size.height;
+    [axisPath moveToPoint:NSMakePoint(plotRect.origin.x, axisY)];
+    [axisPath lineToPoint:NSMakePoint(plotRect.origin.x + plotRect.size.width, axisY)];
+    [axisPath setLineWidth:1.0];
+    [axisPath stroke];
 
-    // Draw each column.
-    for (NSUInteger columnIndex = 0; columnIndex < _columnCount; columnIndex++) {
+    // Draw each series.
+    for (int i = 0; i < _data.seriesCount; i++) {
+	Series *series = [_data seriesAtIndex:i];
+
 	NSBezierPath *line = [NSBezierPath bezierPath];
 	BOOL firstPoint = YES;
 	
-	for (NSUInteger rowIndex = 0; rowIndex < _rowCount; rowIndex++) {
-	    NSUInteger rowColumnCount = [self.data columnsForRow:rowIndex];
-	    if (columnIndex < rowColumnCount) {
-		double value = [self.data valueAtRow:rowIndex andColumn:columnIndex];
-		// XXX Doesn't handle rowCount <= 1.
-		NSPoint point = NSMakePoint(
-					    plotRect.origin.x + rowIndex*plotRect.size.width/(_rowCount - 1),
-					    plotRect.origin.y + (value - _minValue)*plotRect.size.height/_range
-		);
-		if (firstPoint) {
-		    [line moveToPoint:point];
-		    firstPoint = NO;
-		} else {
-		    [line lineToPoint:point];
-		}
+	for (int j = 0; j < series.count; j++) {
+	    double value = [series valueAt:j];
+	    
+	    // XXX Doesn't handle series.count <= 1.
+	    NSPoint point = NSMakePoint(
+					plotRect.origin.x + j*plotRect.size.width/(series.count - 1),
+					plotRect.origin.y + (value - axis.minValue)*plotRect.size.height/axis.range
+					);
+	    if (firstPoint) {
+		[line moveToPoint:point];
+		firstPoint = NO;
+	    } else {
+		[line lineToPoint:point];
 	    }
 	}
 	[line setLineWidth:2.0];
-	NSColor *plotColor = [_plotColors objectAtIndex:(columnIndex % _plotColors.count)];
+	NSColor *plotColor = [_plotColors objectAtIndex:(i % _plotColors.count)];
 	[plotColor set];
 	
 	[line stroke];

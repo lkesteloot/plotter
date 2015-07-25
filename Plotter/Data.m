@@ -8,46 +8,71 @@
 
 #import "Data.h"
 
+@interface Data () {
+    // Array of Series objects.
+    NSMutableArray *_seriesArray;
+
+    // Used during loading.
+    int _currentColumn;
+    
+    // The number of data points in any series (all the same).
+    int _dataPointCount;
+}
+
+@end
+
 @implementation Data
 
-@dynamic rowCount;
+@dynamic seriesCount;
+@dynamic dataPointCount;
 
 - (id)init {
     self = [super init];
 
     if (self) {
-	_rows = [NSMutableArray array];
+	_seriesArray = [NSMutableArray array];
+	_axis = [[Axis alloc] init];
+	_currentColumn = 0;
+	_dataPointCount = 0;
     }
 
     return self;
 }
 
 - (void)newRow {
-    [self.rows addObject:[NSMutableArray array]];
+    _currentColumn = 0;
+    _dataPointCount++;
 }
 
 - (void)newValue:(double)value {
-    NSMutableArray *lastRow = [self.rows lastObject];
-    if (lastRow == nil) {
-	@throw([NSException exceptionWithName:@"empty data" reason:@"must call newRow first" userInfo:nil]);
+    // Add new Series if necessary.
+    if (_currentColumn >= _seriesArray.count) {
+	[_seriesArray addObject:[[Series alloc] init]];
     }
 
-    [lastRow addObject:[NSNumber numberWithDouble:value]];
+    Series *series = [_seriesArray objectAtIndex:_currentColumn];
+    [series addDataPoint:value];
+    _currentColumn++;
 }
 
-- (NSUInteger)rowCount {
-    return self.rows.count;
+- (void)processData {
+    for (NSUInteger i = 0; i < _seriesArray.count; i++) {
+	Series *series = [_seriesArray objectAtIndex:i];
+	[series processData];
+	[self.axis addSeries:series];
+    }
 }
 
-- (NSUInteger)columnsForRow:(NSUInteger)rowIndex {
-    NSArray *row = [self.rows objectAtIndex:rowIndex];
-    return row.count;
+- (int)seriesCount {
+    return (int) _seriesArray.count;
 }
 
-- (double)valueAtRow:(NSUInteger)rowIndex andColumn:(NSUInteger)columnIndex {
-    NSArray *row = [self.rows objectAtIndex:rowIndex];
-    NSNumber *value = [row objectAtIndex:columnIndex];
-    return [value doubleValue];
+- (int)dataPointCount {
+    return _dataPointCount;
+}
+
+- (Series *)seriesAtIndex:(int)index {
+    return [_seriesArray objectAtIndex:index];
 }
 
 @end

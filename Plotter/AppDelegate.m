@@ -40,6 +40,8 @@ NSString *NEW_DATA_NOTIFICATION = @"NEW_DATA_NOTIFICATION";
 	    [data newValue:value];
 	}
     }
+    
+    [data processData];
 
     return data;
 }

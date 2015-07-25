@@ -15,6 +15,8 @@
 		4AF8126D1B61C0BD00BF23C1 /* PlotterTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4AF8126C1B61C0BD00BF23C1 /* PlotterTests.m */; };
 		4AF812781B62020C00BF23C1 /* PlotView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4AF812771B62020C00BF23C1 /* PlotView.m */; };
 		4AF8127B1B62076B00BF23C1 /* Data.m in Sources */ = {isa = PBXBuildFile; fileRef = 4AF8127A1B62076B00BF23C1 /* Data.m */; };
+		4AF8127E1B63669A00BF23C1 /* Series.m in Sources */ = {isa = PBXBuildFile; fileRef = 4AF8127D1B63669A00BF23C1 /* Series.m */; };
+		4AF812811B636C9C00BF23C1 /* Axis.m in Sources */ = {isa = PBXBuildFile; fileRef = 4AF812801B636C9C00BF23C1 /* Axis.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -44,6 +46,10 @@
 		4AF812771B62020C00BF23C1 /* PlotView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PlotView.m; sourceTree = "<group>"; };
 		4AF812791B62076B00BF23C1 /* Data.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Data.h; sourceTree = "<group>"; };
 		4AF8127A1B62076B00BF23C1 /* Data.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Data.m; sourceTree = "<group>"; };
+		4AF8127C1B63669A00BF23C1 /* Series.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Series.h; sourceTree = "<group>"; };
+		4AF8127D1B63669A00BF23C1 /* Series.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Series.m; sourceTree = "<group>"; };
+		4AF8127F1B636C9C00BF23C1 /* Axis.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Axis.h; sourceTree = "<group>"; };
+		4AF812801B636C9C00BF23C1 /* Axis.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Axis.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -96,6 +102,10 @@
 				4AF812771B62020C00BF23C1 /* PlotView.m */,
 				4AF812791B62076B00BF23C1 /* Data.h */,
 				4AF8127A1B62076B00BF23C1 /* Data.m */,
+				4AF8127C1B63669A00BF23C1 /* Series.h */,
+				4AF8127D1B63669A00BF23C1 /* Series.m */,
+				4AF8127F1B636C9C00BF23C1 /* Axis.h */,
+				4AF812801B636C9C00BF23C1 /* Axis.m */,
 			);
 			path = Plotter;
 			sourceTree = "<group>";
@@ -225,11 +235,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4AF8127E1B63669A00BF23C1 /* Series.m in Sources */,
 				4AF8127B1B62076B00BF23C1 /* Data.m in Sources */,
 				4AF8125C1B61C0BC00BF23C1 /* ViewController.m in Sources */,
 				4AF812591B61C0BC00BF23C1 /* main.m in Sources */,
 				4AF812571B61C0BC00BF23C1 /* AppDelegate.m in Sources */,
 				4AF812781B62020C00BF23C1 /* PlotView.m in Sources */,
+				4AF812811B636C9C00BF23C1 /* Axis.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -7,17 +7,24 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "Series.h"
+#import "Axis.h"
 
 @interface Data : NSObject
 
-// Array of NSMutableArray of NSNumber.
-@property (nonatomic) NSMutableArray *rows;
-@property (nonatomic,readonly) NSUInteger rowCount;
-
+// To fill the data.
 - (void)newRow;
 - (void)newValue:(double)value;
 
-- (NSUInteger)columnsForRow:(NSUInteger)rowIndex;
-- (double)valueAtRow:(NSUInteger)rowIndex andColumn:(NSUInteger)columnIndex;
+// To process the data once filled.
+- (void)processData;
+
+// To fetch the data. Every series will have the same number of data points.
+@property (nonatomic,readonly) int seriesCount;
+@property (nonatomic,readonly) int dataPointCount;
+- (Series *)seriesAtIndex:(int)index;
+
+// Plot info.
+@property (nonatomic,readonly) Axis *axis;
 
 @end
