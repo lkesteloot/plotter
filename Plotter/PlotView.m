@@ -80,7 +80,7 @@
     NSRectFill(rect);
     
     // Grid.
-    double gridSpacing = 1;
+    double gridSpacing = .1;
     [_minorGridColor set];
     double y = floor(axis.minValue/gridSpacing)*gridSpacing;
     double lastY = ceil(axis.maxValue/gridSpacing)*gridSpacing;
@@ -168,7 +168,7 @@
 
 	    // Where to draw our sample line.
 	    CGFloat lineX = point.x + size.width + margin;
-	    CGFloat lineY = titleY - _legendFont.descender + _legendFont.xHeight/2 + 1; // +1 cause it's too low otherwise.
+	    CGFloat lineY = titleY - _legendFont.descender + _legendFont.xHeight/2 + 1; // +1 cause it's too low otherwise for our font.
 
 	    // Draw the line.
 	    NSBezierPath *path = [NSBezierPath bezierPath];
