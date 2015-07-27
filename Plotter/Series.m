@@ -9,6 +9,7 @@
 #import "Series.h"
 
 @interface Series () {
+    NSString *_header;
     NSMutableArray *_rawData;
     double *_data;
 }
@@ -35,6 +36,11 @@
 - (void)dealloc {
     free(_data);
     _data = nil;
+}
+
+- (void)setHeader:(NSString *)header {
+    _header = header;
+    _title = header;
 }
 
 - (void)addDataPoint:(double)value {

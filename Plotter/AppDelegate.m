@@ -26,19 +26,9 @@ NSString *NEW_DATA_NOTIFICATION = @"NEW_DATA_NOTIFICATION";
 - (Data *)loadData {
     Data *data = [[Data alloc] init];
 
-    char buf[1024];
+    char buf[1024]; // XXX bad limit.
     while (gets(buf)) { // XXX Don't use gets().
-	char *s = buf;
-	char *end;
-	[data newRow];
-	while (YES) {
-	    double value = strtod(s, &end);
-	    if (end == s) {
-		break;
-	    }
-	    s = end;
-	    [data newValue:value];
-	}
+	[data newLine:buf];
     }
     
     [data processData];

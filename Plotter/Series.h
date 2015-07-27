@@ -14,7 +14,9 @@
 @property (nonatomic,readonly) double minValue;
 @property (nonatomic,readonly) double maxValue;
 @property (nonatomic,readonly) double range;
+@property (nonatomic,readonly) NSString *title;
 
+- (void)setHeader:(NSString *)header;
 - (void)addDataPoint:(double)value;
 - (void)processData;
 

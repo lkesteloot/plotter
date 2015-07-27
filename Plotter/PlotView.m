@@ -16,6 +16,8 @@
     NSColor *_axisColor;
     NSColor *_majorGridColor;
     NSColor *_minorGridColor;
+    NSColor *_legendColor;
+    NSFont *_legendFont;
     NSArray *_plotColors;
 }
 
@@ -32,12 +34,14 @@
     _axisColor = [_backgroundColor blendedColorWithFraction:0.2 ofColor:[NSColor whiteColor]];
     _majorGridColor = [_backgroundColor blendedColorWithFraction:0.1 ofColor:[NSColor whiteColor]];
     _minorGridColor = [_backgroundColor blendedColorWithFraction:0.03 ofColor:[NSColor whiteColor]];
-    
+    _legendColor = [_backgroundColor blendedColorWithFraction:0.5 ofColor:[NSColor whiteColor]];
+    _legendFont = [NSFont fontWithName:@"Helvetica" size:14];
+
     NSMutableArray *plotColors = [NSMutableArray array];
     [plotColors addObject:[_backgroundColor blendedColorWithFraction:0.4 ofColor:[NSColor greenColor]]];
+    [plotColors addObject:[_backgroundColor blendedColorWithFraction:0.4 ofColor:[NSColor yellowColor]]];
     [plotColors addObject:[_backgroundColor blendedColorWithFraction:0.4 ofColor:[NSColor redColor]]];
     [plotColors addObject:[_backgroundColor blendedColorWithFraction:0.4 ofColor:[NSColor cyanColor]]];
-    [plotColors addObject:[_backgroundColor blendedColorWithFraction:0.4 ofColor:[NSColor yellowColor]]];
     [plotColors addObject:[_backgroundColor blendedColorWithFraction:0.4 ofColor:[NSColor purpleColor]]];
     _plotColors = plotColors;
 }
@@ -128,6 +132,55 @@
 	[plotColor set];
 	
 	[line stroke];
+    }
+    
+    [self drawLegend:plotRect];
+}
+
+- (void)drawLegend:(NSRect)plotRect {
+    NSMutableParagraphStyle *style = [[NSParagraphStyle defaultParagraphStyle] mutableCopy]; // XXX store somewhere.
+    [style setAlignment:NSRightTextAlignment];
+
+    CGFloat leading = 20;
+    CGFloat lineLength = 20;
+    CGFloat margin = 5;
+    CGFloat titleY = plotRect.origin.y + plotRect.size.height - leading;
+
+    for (int i = 0; i < _data.seriesCount; i++) {
+	Series *series = [_data seriesAtIndex:i];
+	NSString *title = series.title;
+	
+	if (title != nil) {
+	    // The attributes for this legend text.
+	    NSDictionary *attr = @{
+				   NSForegroundColorAttributeName: _legendColor,
+				   NSParagraphStyleAttributeName: style,
+				   NSFontAttributeName: _legendFont
+				   };
+
+	    // The width of the legent text so we can right-align it.
+	    NSSize size = [title sizeWithAttributes:attr];
+
+	    // Draw the text. The point is the origin of the text, which is at the left of it and below the
+	    // descenders (despite what the docs say).
+	    NSPoint point = NSMakePoint(plotRect.origin.x + plotRect.size.width - lineLength - margin - size.width, titleY);
+	    [title drawAtPoint:point withAttributes:attr];
+
+	    // Where to draw our sample line.
+	    CGFloat lineX = point.x + size.width + margin;
+	    CGFloat lineY = titleY - _legendFont.descender + _legendFont.xHeight/2 + 1; // +1 cause it's too low otherwise.
+
+	    // Draw the line.
+	    NSBezierPath *path = [NSBezierPath bezierPath];
+	    [path moveToPoint:NSMakePoint(lineX, lineY)];
+	    [path lineToPoint:NSMakePoint(lineX + lineLength, lineY)];
+	    NSColor *plotColor = [_plotColors objectAtIndex:(i % _plotColors.count)];
+	    [plotColor set];
+	    [path setLineWidth:2.0];
+	    [path stroke];
+
+	    titleY -= leading;
+	}
     }
 }
 
