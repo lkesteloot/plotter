@@ -13,7 +13,7 @@
 @interface Data : NSObject
 
 // To fill the data.
-- (void)newLine:(char *)line;
+- (void)newLine:(NSString *)line;
 - (void)newRow;
 - (void)newValue:(double)value;
 

@@ -24,13 +24,15 @@ NSString *NEW_DATA_NOTIFICATION = @"NEW_DATA_NOTIFICATION";
 }
 
 - (Data *)loadData {
-    Data *data = [[Data alloc] init];
-
-    char buf[1024]; // XXX bad limit.
-    while (gets(buf)) { // XXX Don't use gets().
-	[data newLine:buf];
-    }
+    NSFileHandle *stdin = [NSFileHandle fileHandleWithStandardInput];
+    NSData *inputData = [stdin readDataToEndOfFile];
+    NSString *input = [[NSString alloc] initWithData:inputData encoding:NSUTF8StringEncoding];
+    NSArray *lines = [input componentsSeparatedByString:@"\n"];
     
+    Data *data = [[Data alloc] init];
+    for (NSString *line in lines) {
+	[data newLine:line];
+    }
     [data processData];
 
     return data;

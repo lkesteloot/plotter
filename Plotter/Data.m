@@ -18,6 +18,12 @@
     
     // The number of data points in any series (all the same).
     int _dataPointCount;
+    
+    // Characters we use to detect a header.
+    NSCharacterSet *_headerCharacterSet;
+    
+    // Characters we use to separate data fields.
+    NSCharacterSet *_dataSeparatorCharacterSet;
 }
 
 @end
@@ -36,14 +42,20 @@
 	_currentColumn = 0;
 	_firstLine = YES;
 	_dataPointCount = 0;
+	
+	// All letters except for "e", which might be an exponent (123e4). Also include brackets so that
+	// if the user wants to have a header that's entirely numeric, they can add empty options to force
+	// it to be recognized as a header.
+	_headerCharacterSet = [NSCharacterSet characterSetWithCharactersInString:@"abcdfghijklmnopqrstuvwxyz[]"];
+	
+	// Currently either spaces or tabs, though we should be more robust about this.
+	_dataSeparatorCharacterSet = [NSCharacterSet characterSetWithCharactersInString:@" \t"];
     }
 
     return self;
 }
 
-- (void)newLine:(char *)line {
-    char *s = line;
-    
+- (void)newLine:(NSString *)line {
     // If it's the first line we see, and it contains letter, then it's a header row.
     if (_firstLine) {
 	_firstLine = NO;
@@ -53,15 +65,19 @@
 	}
     }
 
+    // Else parse it as a data row. These can be separated by tabs or spaces.
     [self newRow];
-    while (YES) {
-	char *end;
-	double value = strtod(s, &end);
-	if (end == s) {
-	    break;
+    NSScanner *scanner = [NSScanner scannerWithString:line];
+    while (!scanner.atEnd) {
+	// Skip whitespace.
+	[scanner scanCharactersFromSet:_dataSeparatorCharacterSet intoString:nil];
+	
+	// Scan a double.
+	double value;
+	BOOL success = [scanner scanDouble:&value];
+	if (success) {
+	    [self newValue:value];
 	}
-	s = end;
-	[self newValue:value];
     }
 }
 
@@ -88,34 +104,18 @@
 // could be the exponential (123e3). Also note that if the output
 // contains "NaN" we'll think it's a title, but in that case the data
 // is wrecked anyway.
-- (BOOL)containsLetters:(char *)line {
-    while (line != '\0') {
-	char ch = tolower(*line);
-	if (isalpha(ch) && ch != 'e') {
-	    return YES;
-	}
-	
-	line++;
-    }
-
-    return NO;
+- (BOOL)containsLetters:(NSString *)line {
+    NSRange range = [line rangeOfCharacterFromSet:_headerCharacterSet options:NSCaseInsensitiveSearch];
+    return range.location != NSNotFound;
 }
 
 // Parse the header row. The headers must be separated by tabs.
-- (void)parseHeader:(char *)line {
-    while (*line != '\0') {
-	char *header = line;
-
-	char *tab = strchr(line, '\t');
-	if (tab == nil) {
-	    line = line + strlen(line);
-	} else {
-	    *tab = '\0';
-	    line = tab + 1;
-	}
-
+- (void)parseHeader:(NSString *)line {
+    NSArray *headers = [line componentsSeparatedByString:@"\t"];
+    
+    for (NSString *header in headers) {
 	Series *series = [self getNextSeries];
-	[series setHeader:[NSString stringWithCString:header encoding:NSUTF8StringEncoding]];
+	[series setHeader:header];
     }
 }
 
