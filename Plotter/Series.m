@@ -34,6 +34,7 @@ static NSDictionary *COLOR_MAP = nil;
 	_maxValue = 0;
 	_range = 0;
 	_color = nil;
+	_hide = NO;
 
 	// Start of options.
 	_startOptionsCharacterSet = [NSCharacterSet characterSetWithCharactersInString:@"["];
@@ -87,6 +88,8 @@ static NSDictionary *COLOR_MAP = nil;
 		NSColor *color = [COLOR_MAP objectForKey:option];
 		if (color != nil) {
 		    _color = color;
+		} else if ([option isEqualToString:@"hide"]) {
+		    _hide = YES;
 		} else {
 		    NSLog(@"Unknown header option: %@", option);
 		}

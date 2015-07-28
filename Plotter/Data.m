@@ -118,8 +118,17 @@
 }
 
 - (void)processData {
-    for (NSUInteger i = 0; i < _seriesArray.count; i++) {
-	Series *series = [_seriesArray objectAtIndex:i];
+    // Remove hidden series.
+    NSMutableArray *newSeriesArray = [NSMutableArray array];
+    for (Series *series in _seriesArray) {
+	if (!series.hide) {
+	    [newSeriesArray addObject:series];
+	}
+    }
+    _seriesArray = newSeriesArray;
+
+    // Process and make axes.
+    for (Series *series in _seriesArray) {
 	[series processData];
 	[self.axis addSeries:series];
     }
