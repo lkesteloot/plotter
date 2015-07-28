@@ -6,7 +6,7 @@
 //  Copyright (c) 2015 HeadCode. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
+#import <Cocoa/Cocoa.h>
 
 @interface Series : NSObject
 
@@ -15,6 +15,7 @@
 @property (nonatomic,readonly) double maxValue;
 @property (nonatomic,readonly) double range;
 @property (nonatomic,readonly) NSString *title;
+@property (nonatomic) NSColor *color;
 
 - (void)setHeader:(NSString *)header;
 - (void)addDataPoint:(double)value;

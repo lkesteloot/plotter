@@ -36,14 +36,6 @@
     _minorGridColor = [_backgroundColor blendedColorWithFraction:0.03 ofColor:[NSColor whiteColor]];
     _legendColor = [_backgroundColor blendedColorWithFraction:0.5 ofColor:[NSColor whiteColor]];
     _legendFont = [NSFont fontWithName:@"Helvetica" size:14];
-
-    NSMutableArray *plotColors = [NSMutableArray array];
-    [plotColors addObject:[_backgroundColor blendedColorWithFraction:0.4 ofColor:[NSColor greenColor]]];
-    [plotColors addObject:[_backgroundColor blendedColorWithFraction:0.4 ofColor:[NSColor yellowColor]]];
-    [plotColors addObject:[_backgroundColor blendedColorWithFraction:0.4 ofColor:[NSColor redColor]]];
-    [plotColors addObject:[_backgroundColor blendedColorWithFraction:0.4 ofColor:[NSColor cyanColor]]];
-    [plotColors addObject:[_backgroundColor blendedColorWithFraction:0.4 ofColor:[NSColor purpleColor]]];
-    _plotColors = plotColors;
 }
 
 - (Data *)data {
@@ -52,6 +44,27 @@
 
 - (void)setData:(Data *)data {
     _data = data;
+    
+    // Process the colors. We assume that this data's colors have never been processed before, and they
+    // are either missing or fully saturated.
+    NSMutableArray *plotColors = [NSMutableArray array];
+    [plotColors addObject:[NSColor greenColor]];
+    [plotColors addObject:[NSColor yellowColor]];
+    [plotColors addObject:[NSColor redColor]];
+    [plotColors addObject:[NSColor cyanColor]];
+    [plotColors addObject:[NSColor purpleColor]];
+
+    int colorNumber = 0;
+    for (Series *series in data.seriesArray) {
+	NSColor *color = series.color;
+	if (color == nil) {
+	    color = plotColors[colorNumber];
+	    colorNumber = (colorNumber + 1) % plotColors.count;
+	}
+	
+	// Desaturate.
+	series.color = [_backgroundColor blendedColorWithFraction:0.4 ofColor:color];
+    }
 
     // Redraw.
     [self setNeedsDisplay:YES];
@@ -61,7 +74,7 @@
 - (void)drawRect:(NSRect)rect {
     [super drawRect:rect];
 
-    if (_data == nil || _data.seriesCount == 0 || _data.dataPointCount == 0) {
+    if (_data == nil || _data.seriesArray.count == 0 || _data.dataPointCount == 0) {
 	// XXX Draw something.
 	return;
     }
@@ -106,9 +119,7 @@
     [axisPath stroke];
 
     // Draw each series.
-    for (int i = 0; i < _data.seriesCount; i++) {
-	Series *series = [_data seriesAtIndex:i];
-
+    for (Series *series in _data.seriesArray) {
 	NSBezierPath *line = [NSBezierPath bezierPath];
 	BOOL firstPoint = YES;
 	
@@ -128,9 +139,7 @@
 	    }
 	}
 	[line setLineWidth:2.0];
-	NSColor *plotColor = [_plotColors objectAtIndex:(i % _plotColors.count)];
-	[plotColor set];
-	
+	[series.color set];
 	[line stroke];
     }
     
@@ -146,8 +155,7 @@
     CGFloat margin = 5;
     CGFloat titleY = plotRect.origin.y + plotRect.size.height - leading;
 
-    for (int i = 0; i < _data.seriesCount; i++) {
-	Series *series = [_data seriesAtIndex:i];
+    for (Series *series in _data.seriesArray) {
 	NSString *title = series.title;
 	
 	if (title != nil) {
@@ -174,8 +182,7 @@
 	    NSBezierPath *path = [NSBezierPath bezierPath];
 	    [path moveToPoint:NSMakePoint(lineX, lineY)];
 	    [path lineToPoint:NSMakePoint(lineX + lineLength, lineY)];
-	    NSColor *plotColor = [_plotColors objectAtIndex:(i % _plotColors.count)];
-	    [plotColor set];
+	    [series.color set];
 	    [path setLineWidth:2.0];
 	    [path stroke];
 

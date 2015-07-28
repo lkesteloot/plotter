@@ -21,9 +21,8 @@
 - (void)processData;
 
 // To fetch the data. Every series will have the same number of data points.
-@property (nonatomic,readonly) int seriesCount;
+@property (nonatomic,readonly) NSArray *seriesArray;
 @property (nonatomic,readonly) int dataPointCount;
-- (Series *)seriesAtIndex:(int)index;
 
 // Plot info.
 @property (nonatomic,readonly) Axis *axis;

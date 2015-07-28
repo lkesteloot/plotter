@@ -9,7 +9,6 @@
 #import "Data.h"
 
 @interface Data () {
-    // Array of Series objects.
     NSMutableArray *_seriesArray;
 
     // Used during loading.
@@ -30,7 +29,6 @@
 
 @implementation Data
 
-@dynamic seriesCount;
 @dynamic dataPointCount;
 
 - (id)init {
@@ -127,16 +125,8 @@
     }
 }
 
-- (int)seriesCount {
-    return (int) _seriesArray.count;
-}
-
 - (int)dataPointCount {
     return _dataPointCount;
-}
-
-- (Series *)seriesAtIndex:(int)index {
-    return [_seriesArray objectAtIndex:index];
 }
 
 @end

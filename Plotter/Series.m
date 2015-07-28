@@ -8,10 +8,15 @@
 
 #import "Series.h"
 
+static NSDictionary *COLOR_MAP = nil;
+
 @interface Series () {
     NSString *_header;
     NSMutableArray *_rawData;
     double *_data;
+
+    NSCharacterSet *_startOptionsCharacterSet;
+    NSCharacterSet *_terminateOptionCharacterSet;
 }
 
 @end
@@ -28,6 +33,27 @@
 	_minValue = 0;
 	_maxValue = 0;
 	_range = 0;
+	_color = nil;
+
+	// Start of options.
+	_startOptionsCharacterSet = [NSCharacterSet characterSetWithCharactersInString:@"["];
+	_terminateOptionCharacterSet = [NSCharacterSet characterSetWithCharactersInString:@",]"];
+	
+	if (COLOR_MAP == nil) {
+	    COLOR_MAP = @{
+			  @"blue": [NSColor blueColor],
+			  @"brown": [NSColor brownColor],
+			  @"cyan": [NSColor cyanColor],
+			  @"gray": [NSColor grayColor],
+			  @"green": [NSColor greenColor],
+			  @"magenta": [NSColor magentaColor],
+			  @"orange": [NSColor orangeColor],
+			  @"purple": [NSColor purpleColor],
+			  @"red": [NSColor redColor],
+			  @"white": [NSColor whiteColor],
+			  @"yellow": [NSColor yellowColor],
+			  };
+	}
     }
     
     return self;
@@ -40,7 +66,37 @@
 
 - (void)setHeader:(NSString *)header {
     _header = header;
-    _title = header;
+    
+    // Parse header.
+    NSScanner *scanner = [NSScanner scannerWithString:header];
+    
+    // Scan title.
+    NSString *title;
+    [scanner scanUpToCharactersFromSet:_startOptionsCharacterSet intoString:&title];
+    if (!scanner.atEnd) {
+	// We have options. Skip open bracket.
+	[scanner scanCharactersFromSet:_startOptionsCharacterSet intoString:nil];
+	
+	// Scan each option. They're comma-separated.
+	while (!scanner.atEnd) {
+	    NSString *option;
+	    [scanner scanUpToCharactersFromSet:_terminateOptionCharacterSet intoString:&option];
+	    
+	    if (option.length > 0) {
+		option = [option lowercaseString];
+		NSColor *color = [COLOR_MAP objectForKey:option];
+		if (color != nil) {
+		    _color = color;
+		} else {
+		    NSLog(@"Unknown header option: %@", option);
+		}
+	    }
+	    [scanner scanCharactersFromSet:_terminateOptionCharacterSet intoString:nil];
+	}
+    }
+
+    // Clean up title in case there's a trailing space before the open bracket.
+    _title = [title stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
 }
 
 - (void)addDataPoint:(double)value {
