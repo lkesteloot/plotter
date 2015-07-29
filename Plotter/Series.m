@@ -43,7 +43,7 @@ static NSDictionary *COLOR_MAP = nil;
 	
 	if (COLOR_MAP == nil) {
 	    COLOR_MAP = @{
-			  @"blue": [NSColor blueColor],
+			  @"blue": [[NSColor blueColor] blendedColorWithFraction:0.25 ofColor:[NSColor whiteColor]],
 			  @"brown": [NSColor brownColor],
 			  @"cyan": [NSColor cyanColor],
 			  @"gray": [NSColor grayColor],
