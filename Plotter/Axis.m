@@ -8,19 +8,13 @@
 
 #import "Axis.h"
 
-@interface Axis () {
-    BOOL _firstSeries;
-}
-
-@end
-
 @implementation Axis
 
 - (id)init {
     self = [super init];
     
     if (self) {
-	_firstSeries = YES;
+	_hasSeries = NO;
 	_minValue = 0;
 	_maxValue = 0;
 	_range = 0;
@@ -30,10 +24,10 @@
 }
 
 - (void)addSeries:(Series *)series {
-    if (_firstSeries) {
+    if (!_hasSeries) {
 	_minValue = series.minValue;
 	_maxValue = series.maxValue;
-	_firstSeries = NO;
+	_hasSeries = YES;
     } else {
 	if (series.minValue < _minValue) {
 	    _minValue = series.minValue;

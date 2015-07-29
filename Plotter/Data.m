@@ -36,7 +36,8 @@
 
     if (self) {
 	_seriesArray = [NSMutableArray array];
-	_axis = [[Axis alloc] init];
+	_leftAxis = [[Axis alloc] init];
+	_rightAxis = [[Axis alloc] init];
 	_currentColumn = 0;
 	_firstLine = YES;
 	_dataPointCount = 0;
@@ -130,7 +131,11 @@
     // Process and make axes.
     for (Series *series in _seriesArray) {
 	[series processData];
-	[self.axis addSeries:series];
+	if (series.isRightAxis) {
+	    [self.rightAxis addSeries:series];
+	} else {
+	    [self.leftAxis addSeries:series];
+	}
     }
 }
 

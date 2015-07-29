@@ -25,6 +25,7 @@
 @property (nonatomic,readonly) int dataPointCount;
 
 // Plot info.
-@property (nonatomic,readonly) Axis *axis;
+@property (nonatomic,readonly) Axis *leftAxis;
+@property (nonatomic,readonly) Axis *rightAxis;
 
 @end

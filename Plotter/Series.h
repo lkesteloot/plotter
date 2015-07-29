@@ -17,6 +17,7 @@
 @property (nonatomic,readonly) NSString *title;
 @property (nonatomic) NSColor *color;
 @property (nonatomic,readonly) BOOL hide;
+@property (nonatomic,readonly) BOOL isRightAxis;
 
 - (void)setHeader:(NSString *)header;
 - (void)addDataPoint:(double)value;

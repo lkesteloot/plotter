@@ -79,7 +79,7 @@
 	return;
     }
     
-    Axis *axis = _data.axis;
+    //Axis *axis = _data.axis;
 
     // Plot rectangle.
     NSRect plotRect = [self bounds];
@@ -93,6 +93,7 @@
     NSRectFill(rect);
     
     // Grid.
+    /*
     double gridSpacing = .1;
     [_minorGridColor set];
     double y = floor(axis.minValue/gridSpacing)*gridSpacing;
@@ -106,20 +107,50 @@
 	[grid stroke];
 	y += gridSpacing;
     }
+    */
     
     // Axes.
     [_axisColor set];
-    NSBezierPath *axisPath = [NSBezierPath bezierPath];
-    [axisPath moveToPoint:NSMakePoint(plotRect.origin.x, plotRect.origin.y + plotRect.size.height)];
-    [axisPath lineToPoint:NSMakePoint(plotRect.origin.x, plotRect.origin.y)];
-    CGFloat axisY = plotRect.origin.y - axis.minValue/axis.range*plotRect.size.height;
-    [axisPath moveToPoint:NSMakePoint(plotRect.origin.x, axisY)];
-    [axisPath lineToPoint:NSMakePoint(plotRect.origin.x + plotRect.size.width, axisY)];
-    [axisPath setLineWidth:1.0];
-    [axisPath stroke];
+    Axis *leftAxis = _data.leftAxis;
+    Axis *rightAxis = _data.rightAxis;
+    CGFloat horizontalAxisLength = plotRect.size.width;
+    if (leftAxis.hasSeries && rightAxis.hasSeries) {
+	horizontalAxisLength *= 0.8;
+    }
+
+    // Left axis.
+    if (leftAxis.hasSeries) {
+	// Vertical axis.
+	NSBezierPath *axisPath = [NSBezierPath bezierPath];
+	[axisPath moveToPoint:NSMakePoint(plotRect.origin.x, plotRect.origin.y + plotRect.size.height)];
+	[axisPath lineToPoint:NSMakePoint(plotRect.origin.x, plotRect.origin.y)];
+
+	// Horizontal axis at zero.
+	CGFloat axisY = plotRect.origin.y - leftAxis.minValue/leftAxis.range*plotRect.size.height;
+	[axisPath moveToPoint:NSMakePoint(plotRect.origin.x, axisY)];
+	[axisPath lineToPoint:NSMakePoint(plotRect.origin.x + horizontalAxisLength, axisY)];
+	[axisPath setLineWidth:1.0];
+	[axisPath stroke];
+    }
+    
+    // Right axis.
+    if (rightAxis.hasSeries) {
+	// Vertical axis.
+	NSBezierPath *axisPath = [NSBezierPath bezierPath];
+	[axisPath moveToPoint:NSMakePoint(plotRect.origin.x + plotRect.size.width, plotRect.origin.y + plotRect.size.height)];
+	[axisPath lineToPoint:NSMakePoint(plotRect.origin.x + plotRect.size.width, plotRect.origin.y)];
+
+	// Horizontal axis at zero.
+	CGFloat axisY = plotRect.origin.y - rightAxis.minValue/rightAxis.range*plotRect.size.height;
+	[axisPath moveToPoint:NSMakePoint(plotRect.origin.x + plotRect.size.width - horizontalAxisLength, axisY)];
+	[axisPath lineToPoint:NSMakePoint(plotRect.origin.x + plotRect.size.width, axisY)];
+	[axisPath setLineWidth:1.0];
+	[axisPath stroke];
+    }
 
     // Draw each series.
     for (Series *series in _data.seriesArray) {
+	Axis *axis = series.isRightAxis ? rightAxis : leftAxis;
 	NSBezierPath *line = [NSBezierPath bezierPath];
 	BOOL firstPoint = YES;
 	
