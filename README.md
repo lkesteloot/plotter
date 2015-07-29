@@ -14,7 +14,18 @@ have any number of values, separated by spaces or tabs:
     ...
 
 Each column represents a series, which will be drawn horizontally in
-a plot, like this:
+a plot. For example, this program (see `example.py`):
+
+    import math
+
+    print "Sine*Exp\tCosine"
+
+    t = 0
+    while t < 20:
+        print math.sin(t)*math.exp(-t*0.1), math.cos(t)
+        t += 0.1
+
+generates this plot:
 
 ![Screenshot of Plotter](screenshot.png)
 
