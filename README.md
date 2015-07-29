@@ -4,7 +4,7 @@ Mac OS X app to plot numbers fed to it through standard input.
 
 Usage:
 
-    % python foo.py | Plotter
+    % python example.py | Plotter
 
 The data must have one line per data point, and a data point can
 have any number of values, separated by spaces or tabs:
@@ -55,6 +55,17 @@ The options are:
   or vastly different ranges.
 - Whether to hide the series altogether (`hide`). This is useful if you want to omit the
   series from the plot without modifying your program much.
+
+To actually run the binary from the command line, you'll have to add the build directory
+to your path, copy the binary to a directory already in your path, or run it
+directly from the build directory. For me the build location is something like
+`/Users/lk/Library/Developer/Xcode/DerivedData/Plotter-btpwhghyeyiylxbuefmsxxunmfrc/Build/Products/Debug/Plotter.app/Contents/MacOS/Plotter`. I found this by temporarily adding this to
+the top of the `main()` function:
+
+    NSLog(@"%s", argv[0]);
+
+and running the app in Xcode. Running the app this way hangs, since there's nothing
+on the standard input, but it'll show you its full filepath.
 
 # License
 
