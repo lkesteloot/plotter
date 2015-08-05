@@ -35,7 +35,7 @@ static NSDictionary *COLOR_MAP = nil;
 	_range = 0;
 	_color = nil;
 	_hide = NO;
-	_isRightAxis = NO;
+	_seriesType = SeriesTypeLeft;
 
 	// Start of options.
 	_startOptionsCharacterSet = [NSCharacterSet characterSetWithCharactersInString:@"["];
@@ -92,9 +92,11 @@ static NSDictionary *COLOR_MAP = nil;
 		} else if ([option isEqualToString:@"hide"]) {
 		    _hide = YES;
 		} else if ([option isEqualToString:@"left"]) {
-		    _isRightAxis = NO;
+		    _seriesType = SeriesTypeLeft;
 		} else if ([option isEqualToString:@"right"]) {
-		    _isRightAxis = YES;
+		    _seriesType = SeriesTypeLeft;
+		} else if ([option isEqualToString:@"domain"]) {
+		    _seriesType = SeriesTypeDomain;
 		} else {
 		    NSLog(@"Unknown header option: %@", option);
 		}

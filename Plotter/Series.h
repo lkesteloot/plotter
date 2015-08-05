@@ -8,6 +8,12 @@
 
 #import <Cocoa/Cocoa.h>
 
+typedef NS_ENUM(NSInteger, SeriesType) {
+    SeriesTypeLeft,
+    SeriesTypeRight,
+    SeriesTypeDomain
+};
+
 @interface Series : NSObject
 
 @property (nonatomic,readonly) int count;
@@ -17,7 +23,7 @@
 @property (nonatomic,readonly) NSString *title;
 @property (nonatomic) NSColor *color;
 @property (nonatomic,readonly) BOOL hide;
-@property (nonatomic,readonly) BOOL isRightAxis;
+@property (nonatomic,readonly) SeriesType seriesType;
 
 - (void)setHeader:(NSString *)header;
 - (void)addDataPoint:(double)value;

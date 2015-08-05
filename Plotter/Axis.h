@@ -11,10 +11,10 @@
 
 @interface Axis : NSObject
 
-@property (nonatomic,readonly) BOOL hasSeries;
 @property (nonatomic,readonly) double minValue;
 @property (nonatomic,readonly) double maxValue;
 @property (nonatomic,readonly) double range;
+@property (nonatomic,readonly) NSArray *seriesArray;
 
 - (void)addSeries:(Series *)series;
 

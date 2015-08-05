@@ -127,15 +127,39 @@
 	}
     }
     _seriesArray = newSeriesArray;
+    _domainSeries = nil;
 
     // Process and make axes.
     for (Series *series in _seriesArray) {
 	[series processData];
-	if (series.isRightAxis) {
-	    [self.rightAxis addSeries:series];
-	} else {
-	    [self.leftAxis addSeries:series];
+	switch (series.seriesType) {
+	    case SeriesTypeLeft:
+		[self.leftAxis addSeries:series];
+		break;
+		
+	    case SeriesTypeRight:
+		[self.rightAxis addSeries:series];
+		break;
+		
+	    case SeriesTypeDomain:
+		if (_domainSeries != nil) {
+		    NSLog(@"Cannot have more than one domain series.");
+		} else {
+		    _domainSeries = series;
+		}
+		break;
 	}
+    }
+    
+    // Generate a domain series if one wasn't specified.
+    if (_domainSeries == nil) {
+	_domainSeries = [[Series alloc] init];
+
+	// One point for each line.
+	for (int i = 1; i <= _dataPointCount; i++) {
+	    [_domainSeries addDataPoint:i];
+	}
+	[_domainSeries processData];
     }
 }
 
