@@ -55,6 +55,9 @@ The options are:
   or vastly different ranges.
 - Whether to hide the series altogether (`hide`). This is useful if you want to omit the
   series from the plot without modifying your program much.
+- Whether the series should be the domain (`domain`). If this flag is specified, then the
+  series will be used for the horizontal axis. If missing, the domain will implicitly
+  be the line number (starting with 1).
 
 To actually run the binary from the command line, you'll have to add the build directory
 to your path, copy the binary to a directory already in your path, or run it
