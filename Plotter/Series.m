@@ -9,14 +9,14 @@
 #import "Series.h"
 
 static NSDictionary *COLOR_MAP = nil;
+static NSCharacterSet *START_OPTIONS_CHARACTER_SET = nil;
+static NSCharacterSet *TERMINATE_OPTION_CHARACTER_SET = nil;
 
 @interface Series () {
     NSString *_header;
     NSMutableArray *_rawData;
     double *_data;
 
-    NSCharacterSet *_startOptionsCharacterSet;
-    NSCharacterSet *_terminateOptionCharacterSet;
 }
 
 @end
@@ -36,11 +36,15 @@ static NSDictionary *COLOR_MAP = nil;
 	_color = nil;
 	_hide = NO;
 	_seriesType = SeriesTypeLeft;
+	_derivative = 0;
 
-	// Start of options.
-	_startOptionsCharacterSet = [NSCharacterSet characterSetWithCharactersInString:@"["];
-	_terminateOptionCharacterSet = [NSCharacterSet characterSetWithCharactersInString:@",]"];
-	
+	// Initialize static objects.
+	if (START_OPTIONS_CHARACTER_SET == nil) {
+	    START_OPTIONS_CHARACTER_SET = [NSCharacterSet characterSetWithCharactersInString:@"["];
+	}
+	if (TERMINATE_OPTION_CHARACTER_SET == nil) {
+	    TERMINATE_OPTION_CHARACTER_SET = [NSCharacterSet characterSetWithCharactersInString:@",]"];
+	}
 	if (COLOR_MAP == nil) {
 	    COLOR_MAP = @{
 			  @"blue": [[NSColor blueColor] blendedColorWithFraction:0.25 ofColor:[NSColor whiteColor]],
@@ -61,6 +65,28 @@ static NSDictionary *COLOR_MAP = nil;
     return self;
 }
 
+- (id)initAsCopyOf:(Series *)other {
+    self = [self init];
+    
+    if (self) {
+	_rawData = [NSMutableArray arrayWithArray:other->_rawData];
+	_count = other->_count;
+	_data = malloc(sizeof(double)*_count);
+	for (int i = 0; i < _count; i++) {
+	    _data[i] = other->_data[i];
+	}
+	_minValue = other->_minValue;
+	_maxValue = other->_maxValue;
+	_range = other->_range;
+	_color = other->_color;
+	_hide = other->_hide;
+	_seriesType = other->_seriesType;
+	_derivative = other->_derivative;
+    }
+    
+    return self;
+}
+
 - (void)dealloc {
     free(_data);
     _data = nil;
@@ -74,15 +100,15 @@ static NSDictionary *COLOR_MAP = nil;
     
     // Scan title.
     NSString *title;
-    [scanner scanUpToCharactersFromSet:_startOptionsCharacterSet intoString:&title];
+    [scanner scanUpToCharactersFromSet:START_OPTIONS_CHARACTER_SET intoString:&title];
     if (!scanner.atEnd) {
 	// We have options. Skip open bracket.
-	[scanner scanCharactersFromSet:_startOptionsCharacterSet intoString:nil];
+	[scanner scanCharactersFromSet:START_OPTIONS_CHARACTER_SET intoString:nil];
 	
 	// Scan each option. They're comma-separated.
 	while (!scanner.atEnd) {
 	    NSString *option;
-	    [scanner scanUpToCharactersFromSet:_terminateOptionCharacterSet intoString:&option];
+	    [scanner scanUpToCharactersFromSet:TERMINATE_OPTION_CHARACTER_SET intoString:&option];
 	    
 	    if (option.length > 0) {
 		option = [option lowercaseString];
@@ -94,14 +120,16 @@ static NSDictionary *COLOR_MAP = nil;
 		} else if ([option isEqualToString:@"left"]) {
 		    _seriesType = SeriesTypeLeft;
 		} else if ([option isEqualToString:@"right"]) {
-		    _seriesType = SeriesTypeLeft;
+		    _seriesType = SeriesTypeRight;
 		} else if ([option isEqualToString:@"domain"]) {
 		    _seriesType = SeriesTypeDomain;
+		} else if ([option isEqualToString:@"derivative"]) {
+		    _derivative += 1;
 		} else {
 		    NSLog(@"Unknown header option: %@", option);
 		}
 	    }
-	    [scanner scanCharactersFromSet:_terminateOptionCharacterSet intoString:nil];
+	    [scanner scanCharactersFromSet:TERMINATE_OPTION_CHARACTER_SET intoString:nil];
 	}
     }
 
@@ -114,19 +142,33 @@ static NSDictionary *COLOR_MAP = nil;
 }
 
 - (void)processData {
+    [self convertToDoubles];
+    [self computeStats];
+}
+
+- (void)convertToDoubles {
     // Convert to C array to avoid boxing/unboxing.
     _count = (int) _rawData.count;
     _data = malloc(sizeof(double)*_count);
-
-    // Gather statistics.
-    _minValue = 0;
-    _maxValue = 0;
 
     for (int i = 0; i < _count; i++) {
 	NSNumber *number = [_rawData objectAtIndex:i];
 	double value = [number doubleValue];
 	_data[i] = value;
-	
+    }
+    
+    // Free this, we no longer need it.
+    _rawData = nil;
+}
+
+- (void)computeStats {
+    // Gather statistics.
+    _minValue = 0;
+    _maxValue = 0;
+
+    for (int i = 0; i < _count; i++) {
+	double value = _data[i];
+
 	if (i == 0) {
 	    _minValue = value;
 	    _maxValue = value;
@@ -139,15 +181,40 @@ static NSDictionary *COLOR_MAP = nil;
 	    }
 	}
     }
-    
-    // Free this, we no longer need it.
-    _rawData = nil;
 
     _range = _maxValue - _minValue;
 }
 
 - (double)valueAt:(int)index {
     return _data[index];
+}
+
+- (void)replaceWithMidpoints {
+    if (_count > 0) {
+	for (int i = 0; i < _count - 1; i++) {
+	    _data[i] = (_data[i] + _data[i + 1])/2;
+	}
+	
+	_count--;
+    }
+}
+
+- (void)computeDerivativeWithDomain:(Series *)domainSeries {
+    if (_count > 0) {
+	for (int i = 0; i < _count - 1; i++) {
+	    double dx = [domainSeries valueAt:(i + 1)] - [domainSeries valueAt:i];
+	    if (dx == 0) {
+		_data[i] = 0;
+	    } else {
+		_data[i] = (_data[i + 1] - _data[i])/dx;
+	    }
+	}
+	
+	_count--;
+	_title = [_title stringByAppendingString:@"’"];
+    }
+
+    [self computeStats];
 }
 
 @end

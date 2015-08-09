@@ -79,8 +79,6 @@
 	return;
     }
     
-    Series *domainSeries = _data.domainSeries;
-
     // Plot rectangle.
     NSRect plotRect = [self bounds];
     plotRect.origin.x += MARGIN;
@@ -98,8 +96,8 @@
     [self drawAxis:_data.rightAxis atX:(plotRect.origin.x + plotRect.size.width) inPlotRect:plotRect];
 
     // Draw each series.
-    [self drawSeriesInAxis:_data.leftAxis inPlotRect:plotRect withDomain:domainSeries];
-    [self drawSeriesInAxis:_data.rightAxis inPlotRect:plotRect withDomain:domainSeries];
+    [self drawSeriesInAxis:_data.leftAxis inPlotRect:plotRect];
+    [self drawSeriesInAxis:_data.rightAxis inPlotRect:plotRect];
     
     [self drawLegend:plotRect];
 }
@@ -125,8 +123,9 @@
     [axisPath stroke];
 }
 
-- (void)drawSeriesInAxis:(Axis *)axis inPlotRect:(CGRect)plotRect withDomain:(Series *)domainSeries {
+- (void)drawSeriesInAxis:(Axis *)axis inPlotRect:(CGRect)plotRect {
     for (Series *series in axis.seriesArray) {
+	Series *domainSeries = [_data domainSeriesForDerivative:series.derivative];
 	[self drawSeries:series onAxis:axis inPlotRect:plotRect withDomain:domainSeries];
     }
 }

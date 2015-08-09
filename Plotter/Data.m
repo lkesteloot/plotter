@@ -18,6 +18,9 @@
     // The number of data points in any series (all the same).
     int _dataPointCount;
     
+    // Domain series for derivative n.
+    NSMutableArray *_derivativeDomainSeries;
+    
     // Characters we use to detect a header.
     NSCharacterSet *_headerCharacterSet;
     
@@ -41,6 +44,8 @@
 	_currentColumn = 0;
 	_firstLine = YES;
 	_dataPointCount = 0;
+	_derivativeDomainSeries = [NSMutableArray array];
+
 	
 	// All letters except for "e", which might be an exponent (123e4). Also include brackets so that
 	// if the user wants to have a header that's entirely numeric, they can add empty options to force
@@ -127,7 +132,6 @@
 	}
     }
     _seriesArray = newSeriesArray;
-    _domainSeries = nil;
 
     // Process and make axes.
     for (Series *series in _seriesArray) {
@@ -142,29 +146,64 @@
 		break;
 		
 	    case SeriesTypeDomain:
-		if (_domainSeries != nil) {
+		if (_derivativeDomainSeries.count != 0) {
 		    NSLog(@"Cannot have more than one domain series.");
 		} else {
-		    _domainSeries = series;
+		    [_derivativeDomainSeries addObject:series];
 		}
 		break;
 	}
     }
     
     // Generate a domain series if one wasn't specified.
-    if (_domainSeries == nil) {
-	_domainSeries = [[Series alloc] init];
+    if (_derivativeDomainSeries.count == 0) {
+	Series *domainSeries = [[Series alloc] init];
 
 	// One point for each line.
 	for (int i = 1; i <= _dataPointCount; i++) {
-	    [_domainSeries addDataPoint:i];
+	    [domainSeries addDataPoint:i];
 	}
-	[_domainSeries processData];
+	[domainSeries processData];
+	
+	[_derivativeDomainSeries addObject:domainSeries];
     }
+    
+    // Generate domain series for derivative range series.
+    for (Series *series in _seriesArray) {
+	int derivative = series.derivative;
+	
+	// Compute derivatives up to needed one, so we don't have any nils, which aren't allowed by NSArray.
+	for (int d = (int) _derivativeDomainSeries.count; d <= derivative; d++) {
+	    Series *previousDomain = [_derivativeDomainSeries objectAtIndex:(d - 1)];
+	    Series *newDomain = [[Series alloc] initAsCopyOf:previousDomain];
+	    
+	    [newDomain replaceWithMidpoints];
+
+	    [_derivativeDomainSeries addObject:newDomain];
+	}
+    }
+    
+    // Generate derivatives of range series.
+    for (Series *series in _seriesArray) {
+	if (series.seriesType != SeriesTypeDomain) {
+	    for (int d = 0; d < series.derivative; d++) {
+		Series *domainSeries = [_derivativeDomainSeries objectAtIndex:d];
+		[series computeDerivativeWithDomain:domainSeries];
+	    }
+	}
+    }
+    
+    // Compute axis stats now that we've computed the derivatives.
+    [_leftAxis updateStats];
+    [_rightAxis updateStats];
 }
 
 - (int)dataPointCount {
     return _dataPointCount;
+}
+
+- (Series *)domainSeriesForDerivative:(int)derivative {
+    return [_derivativeDomainSeries objectAtIndex:derivative];
 }
 
 @end

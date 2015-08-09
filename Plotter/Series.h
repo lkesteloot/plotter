@@ -24,11 +24,20 @@ typedef NS_ENUM(NSInteger, SeriesType) {
 @property (nonatomic) NSColor *color;
 @property (nonatomic,readonly) BOOL hide;
 @property (nonatomic,readonly) SeriesType seriesType;
+@property (nonatomic,readonly) int derivative;
+
+- (id)init;
+- (id)initAsCopyOf:(Series *)other;
 
 - (void)setHeader:(NSString *)header;
 - (void)addDataPoint:(double)value;
 - (void)processData;
 
 - (double)valueAt:(int)index;
+
+// Does not change the stats.
+- (void)replaceWithMidpoints;
+
+- (void)computeDerivativeWithDomain:(Series *)domainSeries;
 
 @end

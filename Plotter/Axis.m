@@ -32,21 +32,28 @@
 }
 
 - (void)addSeries:(Series *)series {
-    if (_seriesArray.count == 0) {
-	_minValue = series.minValue;
-	_maxValue = series.maxValue;
-    } else {
-	if (series.minValue < _minValue) {
+    [_seriesArray addObject:series];
+}
+
+- (void)updateStats {
+    BOOL first = YES;
+
+    for (Series *series in _seriesArray) {
+	if (first) {
 	    _minValue = series.minValue;
-	}
-	if (series.maxValue > _maxValue) {
 	    _maxValue = series.maxValue;
+	    first = NO;
+	} else {
+	    if (series.minValue < _minValue) {
+		_minValue = series.minValue;
+	    }
+	    if (series.maxValue > _maxValue) {
+		_maxValue = series.maxValue;
+	    }
 	}
     }
-    
-    _range = _maxValue - _minValue;
 
-    [_seriesArray addObject:series];
+    _range = _maxValue - _minValue;
 }
 
 - (NSArray *)seriesArray {

@@ -17,5 +17,6 @@
 @property (nonatomic,readonly) NSArray *seriesArray;
 
 - (void)addSeries:(Series *)series;
+- (void)updateStats;
 
 @end

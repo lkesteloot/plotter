@@ -58,6 +58,8 @@ The options are:
 - Whether the series should be the domain (`domain`). If this flag is specified, then the
   series will be used for the horizontal axis. If missing, the domain will implicitly
   be the line number (starting with 1).
+- Whether to display the derivative of the data (`derivative`). This can be specified multiple
+  times to compute the second derivative, third derivative, and so on.
 
 To actually run the binary from the command line, you'll have to add the build directory
 to your path, copy the binary to a directory already in your path, or run it
