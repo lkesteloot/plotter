@@ -37,6 +37,7 @@ static NSCharacterSet *TERMINATE_OPTION_CHARACTER_SET = nil;
 	_hide = NO;
 	_seriesType = SeriesTypeLeft;
 	_derivative = 0;
+	_isImplicit = NO;
 
 	// Initialize static objects.
 	if (START_OPTIONS_CHARACTER_SET == nil) {
@@ -82,6 +83,7 @@ static NSCharacterSet *TERMINATE_OPTION_CHARACTER_SET = nil;
 	_hide = other->_hide;
 	_seriesType = other->_seriesType;
 	_derivative = other->_derivative;
+	_isImplicit = other->_isImplicit;
     }
     
     return self;

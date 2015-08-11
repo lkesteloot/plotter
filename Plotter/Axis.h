@@ -14,6 +14,10 @@
 @property (nonatomic,readonly) double minValue;
 @property (nonatomic,readonly) double maxValue;
 @property (nonatomic,readonly) double range;
+@property (nonatomic) int gridCount;
+@property (nonatomic) int gridZeroIndex;
+@property (nonatomic) double gridInterval;
+@property (nonatomic) double gridStart;
 @property (nonatomic,readonly) NSArray *seriesArray;
 
 - (void)addSeries:(Series *)series;

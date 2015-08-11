@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4AEF417A1B79B9BA00D6BE9D /* Grid.m in Sources */ = {isa = PBXBuildFile; fileRef = 4AEF41791B79B9BA00D6BE9D /* Grid.m */; };
 		4AF812571B61C0BC00BF23C1 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4AF812561B61C0BC00BF23C1 /* AppDelegate.m */; };
 		4AF812591B61C0BC00BF23C1 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 4AF812581B61C0BC00BF23C1 /* main.m */; };
 		4AF8125C1B61C0BC00BF23C1 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4AF8125B1B61C0BC00BF23C1 /* ViewController.m */; };
@@ -30,6 +31,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		4AEF41781B79B9BA00D6BE9D /* Grid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Grid.h; sourceTree = "<group>"; };
+		4AEF41791B79B9BA00D6BE9D /* Grid.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Grid.m; sourceTree = "<group>"; };
 		4AF812501B61C0BC00BF23C1 /* Plotter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Plotter.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4AF812541B61C0BC00BF23C1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4AF812551B61C0BC00BF23C1 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -106,6 +109,8 @@
 				4AF8127D1B63669A00BF23C1 /* Series.m */,
 				4AF8127F1B636C9C00BF23C1 /* Axis.h */,
 				4AF812801B636C9C00BF23C1 /* Axis.m */,
+				4AEF41781B79B9BA00D6BE9D /* Grid.h */,
+				4AEF41791B79B9BA00D6BE9D /* Grid.m */,
 			);
 			path = Plotter;
 			sourceTree = "<group>";
@@ -242,6 +247,7 @@
 				4AF812571B61C0BC00BF23C1 /* AppDelegate.m in Sources */,
 				4AF812781B62020C00BF23C1 /* PlotView.m in Sources */,
 				4AF812811B636C9C00BF23C1 /* Axis.m in Sources */,
+				4AEF417A1B79B9BA00D6BE9D /* Grid.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -304,6 +310,7 @@
 					"DEBUG=1",
 					"$(inherited)",
 				);
+				"GCC_PREPROCESSOR_DEFINITIONS[arch=*]" = "";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
@@ -389,6 +396,10 @@
 					"DEBUG=1",
 					"$(inherited)",
 				);
+				"GCC_PREPROCESSOR_DEFINITIONS[arch=*]" = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
 				INFOPLIST_FILE = PlotterTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -431,6 +442,7 @@
 				4AF812721B61C0BD00BF23C1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		4AF812731B61C0BD00BF23C1 /* Build configuration list for PBXNativeTarget "PlotterTests" */ = {
 			isa = XCConfigurationList;
@@ -439,6 +451,7 @@
 				4AF812751B61C0BD00BF23C1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

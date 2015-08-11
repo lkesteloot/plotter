@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "Series.h"
 #import "Axis.h"
+#import "Grid.h"
 
 @interface Data : NSObject
 
@@ -27,6 +28,9 @@
 // Plot info.
 @property (nonatomic,readonly) Axis *leftAxis;
 @property (nonatomic,readonly) Axis *rightAxis;
+
+// Misc classes.
+@property (nonatomic,readonly) Grid *grid;
 
 - (Series *)domainSeriesForDerivative:(int)derivative;
 

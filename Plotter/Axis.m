@@ -25,6 +25,10 @@
 	_minValue = 0;
 	_maxValue = 0;
 	_range = 0;
+	_gridCount = 0;
+	_gridZeroIndex = 0;
+	_gridInterval = 0;
+	_gridStart = 0;
 	_seriesArray = [NSMutableArray array];
     }
     

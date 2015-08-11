@@ -8,6 +8,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import <XCTest/XCTest.h>
+#import "Grid.h"
 
 @interface PlotterTests : XCTestCase
 
@@ -25,16 +26,29 @@
     [super tearDown];
 }
 
-- (void)testExample {
-    // This is an example of a functional test case.
-    XCTAssert(YES, @"Pass");
+- (void)testGrid {
+    Grid *grid = [[Grid alloc] init];
+
+    XCTAssertEqual([grid roundUp:1], 1, @"");
+    XCTAssertEqual([grid roundUp:4], 4, @"");
+    XCTAssertEqual([grid roundUp:4.1], 5, @"");
+    XCTAssertEqual([grid roundUp:.99], 1, @"");
+    XCTAssertEqual([grid roundUp:10], 10, @"");
+    XCTAssertEqual([grid roundUp:9.9], 10, @"");
+    XCTAssertEqual([grid roundUp:86], 90, @"");
+    XCTAssertEqual([grid roundUp:123], 200, @"");
+    XCTAssertEqual([grid roundUp:1234], 2000, @"");
 }
 
-- (void)testPerformanceExample {
-    // This is an example of a performance test case.
-    [self measureBlock:^{
-        // Put the code you want to measure the time of here.
-    }];
+- (void)testGridValueStrings {
+    Grid *grid = [[Grid alloc] init];
+
+    XCTAssertEqualObjects([grid gridValueLabelFor:0], @"0", @"");
+    XCTAssertEqualObjects([grid gridValueLabelFor:5], @"5", @"");
+    XCTAssertEqualObjects([grid gridValueLabelFor:1234], @"1,234", @"");
+    XCTAssertEqualObjects([grid gridValueLabelFor:0.1], @"0.1", @"");
+    XCTAssertEqualObjects([grid gridValueLabelFor:0.23], @"0.23", @"");
+    XCTAssertEqualObjects([grid gridValueLabelFor:100.1], @"100.1", @"");
 }
 
 @end

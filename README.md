@@ -59,7 +59,8 @@ The options are:
   series will be used for the horizontal axis. If missing, the domain will implicitly
   be the line number (starting with 1).
 - Whether to display the derivative of the data (`derivative`). This can be specified multiple
-  times to compute the second derivative, third derivative, and so on.
+  times to compute the second derivative, third derivative, and so on. For each derivative,
+  the title in the legend has an apostrophe appended to it.
 
 To actually run the binary from the command line, you'll have to add the build directory
 to your path, copy the binary to a directory already in your path, or run it
@@ -70,7 +71,7 @@ the top of the `main()` function:
     NSLog(@"%s", argv[0]);
 
 and running the app in Xcode. Running the app this way hangs, since there's nothing
-on the standard input, but it'll show you its full filepath.
+on the standard input, but it'll show you its full pathname.
 
 # License
 

@@ -15,12 +15,14 @@ NSString *NEW_DATA_NOTIFICATION = @"NEW_DATA_NOTIFICATION";
 @implementation AppDelegate
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
-    Data *data = [self loadData];
-    [[NSNotificationCenter defaultCenter] postNotificationName:NEW_DATA_NOTIFICATION object:data];
-}
+    NSArray *arguments = [[NSProcessInfo processInfo] arguments];
+    NSLog(@"Args: %@", arguments);
+    BOOL nodata = [arguments containsObject:@"--nodata"];
 
-- (void)applicationWillTerminate:(NSNotification *)aNotification {
-	// Insert code here to tear down your application
+    if (!nodata) {
+	Data *data = [self loadData];
+	[[NSNotificationCenter defaultCenter] postNotificationName:NEW_DATA_NOTIFICATION object:data];
+    }
 }
 
 - (Data *)loadData {
