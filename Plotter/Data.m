@@ -201,8 +201,6 @@
 
     // Compute the grid lines we'll be showing when plotting.
     [self computeDomainGridLines];
-    [self computeRangeGridLinesForAxis:_leftAxis];
-    [self computeRangeGridLinesForAxis:_rightAxis];
 }
 
 - (void)computeDomainGridLines {
@@ -214,41 +212,6 @@
     // - There are always at least five grid lines.
     // - The intervals are chosen from a set of nice numbers.
     // - The intervals go through 0.
-}
-
-- (void)computeRangeGridLinesForAxis:(Axis *)axis {
-    // Unlike the domain, the data lines don't necessary go all the way to the
-    // top and bottom of the plot area. We always force the range to have
-    // five grid lines spaced evenly, and we scale the data to fit. We have
-    // to take into account the left and right axes, which must share grid lines
-    // (but not necessarily share a zero grid line). For each axis:
-    //
-    // - The intervals are chosen from a set of nice numbers.
-    // - The intervals go through 0.
-    // - The data should be as large as possible vertically.
-    // - If the range of the range is 0, include 0 in the plot.
-
-    // Figure out the range (max - min).
-    double range = axis.range;
-    if (range == 0) {
-	// Include 0 in the plot.
-	range = fabs(axis.minValue);
-	if (range == 0) {
-	    // Integer grid lines.
-	    range = 4;
-	}
-    }
-
-    // Initial guess for an interval. Five lines = four intervals.
-    double interval = range / 4;
-
-    // Round up to the nearest nice number.
-    interval = [_grid roundUp:interval];
-
-    axis.gridCount = 5;
-    axis.gridInterval = interval;
-    axis.gridStart = floor(axis.minValue/interval)*interval;
-    axis.gridZeroIndex = (int) floor((0 - axis.gridStart)/interval + 0.5);
 }
 
 - (int)dataPointCount {

@@ -157,8 +157,8 @@
     for (int i = 0; i < count; i++) {
 	int y = plotRect.origin.y + plotRect.size.height*i/4;
 
-	if ((_data.leftAxis.seriesArray.count > 0 && _data.leftAxis.gridZeroIndex == i) ||
-	    (_data.rightAxis.seriesArray.count > 0 && _data.rightAxis.gridZeroIndex == i)) {
+	if ((_data.leftAxis.seriesArray.count > 0 && _data.leftAxis.grid.zeroIndex == i) ||
+	    (_data.rightAxis.seriesArray.count > 0 && _data.rightAxis.grid.zeroIndex == i)) {
 
 	    [_axisColor set];
 	} else {
@@ -172,7 +172,7 @@
 
 	// Left grid values.
 	if (_data.leftAxis.seriesArray.count > 0) {
-	    double gridValue = _data.leftAxis.gridStart + i*_data.leftAxis.gridInterval;
+	    double gridValue = _data.leftAxis.grid.start + i*_data.leftAxis.grid.interval;
 	    NSString *gridValueStr = [_data.grid gridValueLabelFor:gridValue];
 	    NSSize size = [gridValueStr sizeWithAttributes:attr];
 	    CGFloat textY = y + _gridValueFont.descender - _gridValueFont.xHeight/2 - 1;
@@ -182,7 +182,7 @@
 
 	// Right grid values.
 	if (_data.rightAxis.seriesArray.count > 0) {
-	    double gridValue = _data.rightAxis.gridStart + i*_data.rightAxis.gridInterval;
+	    double gridValue = _data.rightAxis.grid.start + i*_data.rightAxis.grid.interval;
 	    NSString *gridValueStr = [_data.grid gridValueLabelFor:gridValue];
 	    CGFloat textY = y + _gridValueFont.descender - _gridValueFont.xHeight/2 - 1;
 	    NSPoint point = NSMakePoint(plotRect.origin.x + plotRect.size.width + GRID_VALUE_PADDING, textY);
@@ -220,8 +220,8 @@
     BOOL firstPoint = YES;
 
     // For remapping to the grid.
-    double minGridValue = axis.gridStart;
-    double gridRange = (axis.gridCount - 1)*axis.gridInterval;
+    double minGridValue = axis.grid.start;
+    double gridRange = (axis.grid.lineCount - 1)*axis.grid.interval;
     
     for (int j = 0; j < series.count; j++) {
 	double domainValue = [domainSeries valueAt:j];

@@ -10,7 +10,22 @@
 
 @interface Grid : NSObject
 
-- (double)roundUp:(double)interval;
+// The number of lines in the grid. Subtract one to get the number of intervals;
+@property (nonatomic) int lineCount;
+
+// Which line index represents zero, value-wise.
+@property (nonatomic) int zeroIndex;
+
+// The value between grid lines.
+@property (nonatomic) double interval;
+
+// The value of the first grid line.
+@property (nonatomic) double start;
+
+- (id)initForRangeWithMin:(double)minValue andMax:(double)maxValue;
+
+- (double)roundUp:(double)value;
+
 - (NSString *)gridValueLabelFor:(double)value;
 
 @end

@@ -25,10 +25,7 @@
 	_minValue = 0;
 	_maxValue = 0;
 	_range = 0;
-	_gridCount = 0;
-	_gridZeroIndex = 0;
-	_gridInterval = 0;
-	_gridStart = 0;
+	_grid = nil;
 	_seriesArray = [NSMutableArray array];
     }
     
@@ -58,6 +55,8 @@
     }
 
     _range = _maxValue - _minValue;
+
+    _grid = [[Grid alloc] initForRangeWithMin:_minValue andMax:_maxValue];
 }
 
 - (NSArray *)seriesArray {

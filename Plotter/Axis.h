@@ -8,17 +8,15 @@
 
 #import <Foundation/Foundation.h>
 #import "Series.h"
+#import "Grid.h"
 
 @interface Axis : NSObject
 
 @property (nonatomic,readonly) double minValue;
 @property (nonatomic,readonly) double maxValue;
 @property (nonatomic,readonly) double range;
-@property (nonatomic) int gridCount;
-@property (nonatomic) int gridZeroIndex;
-@property (nonatomic) double gridInterval;
-@property (nonatomic) double gridStart;
 @property (nonatomic,readonly) NSArray *seriesArray;
+@property (nonatomic,readonly) Grid *grid;
 
 - (void)addSeries:(Series *)series;
 - (void)updateStats;
