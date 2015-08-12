@@ -16,7 +16,6 @@ NSString *NEW_DATA_NOTIFICATION = @"NEW_DATA_NOTIFICATION";
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     NSArray *arguments = [[NSProcessInfo processInfo] arguments];
-    NSLog(@"Args: %@", arguments);
     BOOL nodata = [arguments containsObject:@"--nodata"];
 
     if (!nodata) {

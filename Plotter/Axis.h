@@ -10,6 +10,7 @@
 #import "Series.h"
 #import "Grid.h"
 
+// Left or right vertical axis.
 @interface Axis : NSObject
 
 @property (nonatomic,readonly) double minValue;

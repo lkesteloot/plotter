@@ -29,9 +29,8 @@
 @property (nonatomic,readonly) Axis *leftAxis;
 @property (nonatomic,readonly) Axis *rightAxis;
 
-// Misc classes.
-@property (nonatomic,readonly) Grid *grid;
-
+// Domains and the delta values for derivative plots.
 - (Series *)domainSeriesForDerivative:(int)derivative;
+@property (nonatomic,readonly) Grid *domainGrid;
 
 @end

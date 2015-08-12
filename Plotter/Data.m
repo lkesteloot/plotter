@@ -45,7 +45,7 @@
 	_firstLine = YES;
 	_dataPointCount = 0;
 	_derivativeDomainSeries = [NSMutableArray array];
-	_grid = [[Grid alloc] init];
+	_domainGrid = nil;
 
 	// All letters except for "e", which might be an exponent (123e4). Also include brackets so that
 	// if the user wants to have a header that's entirely numeric, they can add empty options to force
@@ -195,23 +195,13 @@
 	}
     }
     
-    // Compute axis stats now that we've computed the derivatives.
+    // Compute axis stats now that we've computed the derivatives. Also computes the vertical grid.
     [_leftAxis updateStats];
     [_rightAxis updateStats];
 
-    // Compute the grid lines we'll be showing when plotting.
-    [self computeDomainGridLines];
-}
-
-- (void)computeDomainGridLines {
-    // The data lines themselves always go from the
-    // far left to the far right of the plot. We choose grid value intervals
-    // such that:
-    //
-    // - There are as few grid lines as possible.
-    // - There are always at least five grid lines.
-    // - The intervals are chosen from a set of nice numbers.
-    // - The intervals go through 0.
+    // Compute the domain grid lines we'll be showing when plotting.
+    Series *domainSeries = [_derivativeDomainSeries objectAtIndex:0];
+    _domainGrid = [[Grid alloc] initForDomainWithMin:domainSeries.minValue andMax:domainSeries.maxValue];
 }
 
 - (int)dataPointCount {

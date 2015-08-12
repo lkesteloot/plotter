@@ -40,6 +40,21 @@
     XCTAssertEqual([grid roundUp:1234], 2000);
 }
 
+- (void)testGridRoundDown {
+    Grid *grid = [[Grid alloc] init];
+
+    XCTAssertEqual([grid roundDown:1], 1);
+    XCTAssertEqual([grid roundDown:4], 4);
+    XCTAssertEqual([grid roundDown:4.1], 4);
+    XCTAssertEqual([grid roundDown:3.9], 3);
+    XCTAssertEqual([grid roundDown:.99], .9);
+    XCTAssertEqual([grid roundDown:10], 10);
+    XCTAssertEqual([grid roundDown:9.9], 9);
+    XCTAssertEqual([grid roundDown:86], 80);
+    XCTAssertEqual([grid roundDown:123], 100);
+    XCTAssertEqual([grid roundDown:1234], 1000);
+}
+
 - (void)testGridRange {
     Grid *grid;
 
@@ -57,6 +72,28 @@
     XCTAssertEqual(grid.interval, 900);
     XCTAssertEqual(grid.start, -900);
     XCTAssertEqual(grid.zeroIndex, 1);
+}
+
+- (void)testGridDomain {
+    Grid *grid;
+
+    grid = [[Grid alloc] initForDomainWithMin:0 andMax:4];
+    XCTAssertEqual(grid.lineCount, 5);
+    XCTAssertEqual(grid.interval, 1);
+    XCTAssertEqual(grid.start, 0);
+    XCTAssertEqual(grid.zeroIndex, 0);
+
+    grid = [[Grid alloc] initForDomainWithMin:0 andMax:4.1];
+    XCTAssertEqual(grid.lineCount, 5);
+    XCTAssertEqual(grid.interval, 1);
+    XCTAssertEqual(grid.start, 0);
+    XCTAssertEqual(grid.zeroIndex, 0);
+
+    grid = [[Grid alloc] initForDomainWithMin:-0.1 andMax:4];
+    XCTAssertEqual(grid.lineCount, 5);
+    XCTAssertEqual(grid.interval, 1);
+    XCTAssertEqual(grid.start, 0);
+    XCTAssertEqual(grid.zeroIndex, 0);
 }
 
 - (void)testGridValueStrings {

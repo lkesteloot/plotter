@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
+// Represents a horizontal or vertical grid.
 @interface Grid : NSObject
 
 // The number of lines in the grid. Subtract one to get the number of intervals;
@@ -23,8 +24,11 @@
 @property (nonatomic) double start;
 
 - (id)initForRangeWithMin:(double)minValue andMax:(double)maxValue;
+- (id)initForDomainWithMin:(double)minValue andMax:(double)maxValue;
 
+// Only publically visible for unit testing:
 - (double)roundUp:(double)value;
+- (double)roundDown:(double)value;
 
 - (NSString *)gridValueLabelFor:(double)value;
 

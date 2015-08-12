@@ -97,6 +97,11 @@
     if (_data.rightAxis.seriesArray.count > 0) {
 	plotRect.size.width -= GRID_VALUES_MARGIN;
     }
+    Series *domainSeries = [_data domainSeriesForDerivative:0];
+    if (!domainSeries.isImplicit) {
+	plotRect.origin.y += GRID_VALUES_MARGIN;
+	plotRect.size.height -= GRID_VALUES_MARGIN;
+    }
 
     // Draw background.
     [_backgroundColor set];
@@ -121,27 +126,35 @@
 	return;
     }
 
-    double spacing = [self computeSpacingForSeries:series];
-    double first = ceil(series.minValue/spacing)*spacing;
-    double last = floor(series.maxValue/spacing)*spacing;
-    int count = (int) floor((last - first)/spacing + 0.5) + 1;
-    int zeroIndex = (int) floor((0 - first)/spacing + 0.5);
-    NSLog(@"%g %g %g %d %d", spacing, first, last, count, zeroIndex);
+    NSDictionary *attr = @{
+			   NSForegroundColorAttributeName: _gridValueColor,
+			   NSFontAttributeName: _gridValueFont
+			   };
 
-    for (int i = 0; i < count; i++) {
-	double value = first + i*spacing;
+    Grid *grid = _data.domainGrid;
+    for (int i = 0; i < grid.lineCount; i++) {
+	double value = grid.start + i*grid.interval;
 	int x = plotRect.origin.x + (value - series.minValue)*plotRect.size.width/series.range;
 
-	if (i == zeroIndex) {
+	if (i == grid.zeroIndex) {
 	    [_axisColor set];
 	} else {
 	    [_gridColor set];
 	}
 
+	// Draw vertical lines.
 	NSBezierPath *path = [NSBezierPath bezierPath];
 	[path moveToPoint:NSMakePoint(x, plotRect.origin.y)];
 	[path lineToPoint:NSMakePoint(x, plotRect.origin.y + plotRect.size.height)];
 	[path stroke];
+
+	// Draw labels.
+	NSString *gridValueStr = [grid gridValueLabelFor:value];
+	NSSize size = [gridValueStr sizeWithAttributes:attr];
+	CGFloat textX = x - size.width/2;
+	CGFloat textY = plotRect.origin.x - _gridValueFont.ascender + _gridValueFont.descender - GRID_VALUE_PADDING;
+	NSPoint point = NSMakePoint(textX, textY);
+	[gridValueStr drawAtPoint:point withAttributes:attr];
     }
 }
 
@@ -172,8 +185,9 @@
 
 	// Left grid values.
 	if (_data.leftAxis.seriesArray.count > 0) {
-	    double gridValue = _data.leftAxis.grid.start + i*_data.leftAxis.grid.interval;
-	    NSString *gridValueStr = [_data.grid gridValueLabelFor:gridValue];
+	    Grid *grid = _data.leftAxis.grid;
+	    double gridValue = grid.start + i*grid.interval;
+	    NSString *gridValueStr = [grid gridValueLabelFor:gridValue];
 	    NSSize size = [gridValueStr sizeWithAttributes:attr];
 	    CGFloat textY = y + _gridValueFont.descender - _gridValueFont.xHeight/2 - 1;
 	    NSPoint point = NSMakePoint(plotRect.origin.x - size.width - GRID_VALUE_PADDING, textY);
@@ -182,20 +196,14 @@
 
 	// Right grid values.
 	if (_data.rightAxis.seriesArray.count > 0) {
-	    double gridValue = _data.rightAxis.grid.start + i*_data.rightAxis.grid.interval;
-	    NSString *gridValueStr = [_data.grid gridValueLabelFor:gridValue];
+	    Grid *grid = _data.rightAxis.grid;
+	    double gridValue = grid.start + i*grid.interval;
+	    NSString *gridValueStr = [grid gridValueLabelFor:gridValue];
 	    CGFloat textY = y + _gridValueFont.descender - _gridValueFont.xHeight/2 - 1;
 	    NSPoint point = NSMakePoint(plotRect.origin.x + plotRect.size.width + GRID_VALUE_PADDING, textY);
 	    [gridValueStr drawAtPoint:point withAttributes:attr];
 	}
     }
-}
-
-- (double)computeSpacingForSeries:(Series *)series {
-    // We want at least five grid lines, which is four intervals.
-    double spacing = series.range / 4;
-
-    return spacing;
 }
 
 - (void)drawGridInPlotRect:(CGRect)plotRect {

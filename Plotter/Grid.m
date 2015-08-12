@@ -84,9 +84,52 @@
     return self;
 }
 
+- (id)initForDomainWithMin:(double)minValue andMax:(double)maxValue {
+    self = [self init];
+
+    if (self) {
+	// The data lines themselves always go from the
+	// far left to the far right of the plot. We choose grid value intervals
+	// such that:
+	//
+	// - There are as few grid lines as possible.
+	// - There are always at least five grid lines.
+	// - The intervals are chosen from a set of nice numbers.
+	// - The intervals go through 0.
+
+	// Compute the range of values.
+	double range = maxValue - minValue;
+	if (range == 0) {
+	    range = 4;
+	}
+
+	// At least five lines.
+	_interval = [self roundDown:range / 4];
+
+	// Start after the min value.
+	_start = ceil(minValue/_interval)*_interval;
+
+	// End after the max value.
+	double last = floor(maxValue/_interval)*_interval;
+	_lineCount = (int) floor((last - _start)/_interval + 0.5) + 1;
+
+	// Figure out the zero line, if any.
+	_zeroIndex = (int) floor((0 - _start)/_interval + 0.5);
+    }
+
+    return self;
+}
+
 - (double)roundUp:(double)value {
     double decade = pow(10, floor(log10(value)));
     value = ceil(value / decade)*decade;
+
+    return value;
+}
+
+- (double)roundDown:(double)value {
+    double decade = pow(10, floor(log10(value)));
+    value = floor(value / decade)*decade;
 
     return value;
 }
