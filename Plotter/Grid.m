@@ -8,6 +8,10 @@
 
 #import "Grid.h"
 
+// The set of numbers that we can use for grid values.
+static double VALID_VALUES[] = { 1, 1.5, 2, 3, 4, 5, 6, 7.5, 8, 10 };
+static int VALID_VALUE_COUNT = sizeof(VALID_VALUES)/sizeof(VALID_VALUES[0]);
+
 @interface Grid ()
 
 @property (nonatomic) NSNumberFormatter *gridValueFormatter;
@@ -122,14 +126,36 @@
 
 - (double)roundUp:(double)value {
     double decade = pow(10, floor(log10(value)));
-    value = ceil(value / decade)*decade;
+
+    value /= decade;
+
+    // This will always break because we include "10" in the list:
+    for (int i = 0; i < VALID_VALUE_COUNT; i++) {
+	if (VALID_VALUES[i] >= value) {
+	    value = VALID_VALUES[i];
+	    break;
+	}
+    }
+
+    value *= decade;
 
     return value;
 }
 
 - (double)roundDown:(double)value {
     double decade = pow(10, floor(log10(value)));
-    value = floor(value / decade)*decade;
+
+    value /= decade;
+
+    // This will always break because we include "1" in the list:
+    for (int i = VALID_VALUE_COUNT - 1; i >= 0; i--) {
+	if (VALID_VALUES[i] <= value) {
+	    value = VALID_VALUES[i];
+	    break;
+	}
+    }
+
+    value *= decade;
 
     return value;
 }
