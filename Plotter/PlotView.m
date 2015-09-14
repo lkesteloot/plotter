@@ -57,12 +57,13 @@
     [plotColors addObject:[NSColor yellowColor]];
     [plotColors addObject:[NSColor redColor]];
     [plotColors addObject:[NSColor cyanColor]];
-    [plotColors addObject:[NSColor purpleColor]];
+    [plotColors addObject:[[NSColor purpleColor] blendedColorWithFraction:0.5 ofColor:[NSColor whiteColor]]];
+    [plotColors addObject:[[NSColor blueColor] blendedColorWithFraction:0.5 ofColor:[NSColor whiteColor]]];
 
     int colorNumber = 0;
     for (Series *series in data.seriesArray) {
 	NSColor *color = series.color;
-	if (color == nil) {
+	if (color == nil && series.seriesType != SeriesTypeDomain) {
 	    color = plotColors[colorNumber];
 	    colorNumber = (colorNumber + 1) % plotColors.count;
 	}
@@ -132,11 +133,10 @@
 			   };
 
     Grid *grid = _data.domainGrid;
-    for (int i = 0; i < grid.lineCount; i++) {
-	double value = grid.start + i*grid.interval;
-	int x = plotRect.origin.x + (value - series.minValue)*plotRect.size.width/series.range;
+    for (GridLine *gridLine in grid.gridLines) {
+	float x = plotRect.origin.x + [grid positionFor:gridLine.value]*plotRect.size.width;
 
-	if (i == grid.zeroIndex) {
+	if (gridLine.isZero) {
 	    [_axisColor set];
 	} else {
 	    [_gridColor set];
@@ -149,29 +149,44 @@
 	[path stroke];
 
 	// Draw labels.
-	NSString *gridValueStr = [grid gridValueLabelFor:value];
-	NSSize size = [gridValueStr sizeWithAttributes:attr];
-	CGFloat textX = x - size.width/2;
-	CGFloat textY = plotRect.origin.x - _gridValueFont.ascender + _gridValueFont.descender - GRID_VALUE_PADDING;
-	NSPoint point = NSMakePoint(textX, textY);
-	[gridValueStr drawAtPoint:point withAttributes:attr];
+	if (gridLine.drawLabel) {
+	    NSString *gridValueStr = [grid gridValueLabelFor:gridLine.value];
+	    NSSize size = [gridValueStr sizeWithAttributes:attr];
+	    CGFloat textX = x - size.width/2;
+	    CGFloat textY = plotRect.origin.x - _gridValueFont.ascender + _gridValueFont.descender - GRID_VALUE_PADDING;
+	    NSPoint point = NSMakePoint(textX, textY);
+	    [gridValueStr drawAtPoint:point withAttributes:attr];
+	}
     }
 }
 
 - (void)drawRangeGridInPlotRect:(CGRect)plotRect {
-    // We always have exactly five lines.
-    int count = 5;
+    Grid *leftGrid = _data.leftAxis.seriesArray.count > 0 ? _data.leftAxis.grid : nil;
+    Grid *rightGrid = _data.rightAxis.seriesArray.count > 0 ? _data.rightAxis.grid : nil;
+
+    // Either grid.
+    Grid *grid = leftGrid != nil ? leftGrid : rightGrid;
+    if (grid == nil) {
+	return;
+    }
+
+    // Will be the same for all grids (5).
+    NSUInteger lineCount = [grid.gridLines count];
 
     NSDictionary *attr = @{
 			   NSForegroundColorAttributeName: _gridValueColor,
 			   NSFontAttributeName: _gridValueFont
 			   };
 
-    for (int i = 0; i < count; i++) {
-	int y = plotRect.origin.y + plotRect.size.height*i/4;
+    for (int i = 0; i < lineCount; i++) {
+	GridLine *leftGridLine = [leftGrid.gridLines objectAtIndex:i];
+	GridLine *rightGridLine = [rightGrid.gridLines objectAtIndex:i];
+	GridLine *gridLine = [grid.gridLines objectAtIndex:i];
 
-	if ((_data.leftAxis.seriesArray.count > 0 && _data.leftAxis.grid.zeroIndex == i) ||
-	    (_data.rightAxis.seriesArray.count > 0 && _data.rightAxis.grid.zeroIndex == i)) {
+	int y = plotRect.origin.y + [grid positionFor:gridLine.value]*plotRect.size.height;
+
+	if ((leftGridLine != nil && leftGridLine.isZero) ||
+	    (rightGridLine != nil && rightGridLine.isZero)) {
 
 	    [_axisColor set];
 	} else {
@@ -184,10 +199,8 @@
 	[path stroke];
 
 	// Left grid values.
-	if (_data.leftAxis.seriesArray.count > 0) {
-	    Grid *grid = _data.leftAxis.grid;
-	    double gridValue = grid.start + i*grid.interval;
-	    NSString *gridValueStr = [grid gridValueLabelFor:gridValue];
+	if (leftGridLine != nil && leftGridLine.drawLabel) {
+	    NSString *gridValueStr = [grid gridValueLabelFor:gridLine.value];
 	    NSSize size = [gridValueStr sizeWithAttributes:attr];
 	    CGFloat textY = y + _gridValueFont.descender - _gridValueFont.xHeight/2 - 1;
 	    NSPoint point = NSMakePoint(plotRect.origin.x - size.width - GRID_VALUE_PADDING, textY);
@@ -195,10 +208,8 @@
 	}
 
 	// Right grid values.
-	if (_data.rightAxis.seriesArray.count > 0) {
-	    Grid *grid = _data.rightAxis.grid;
-	    double gridValue = grid.start + i*grid.interval;
-	    NSString *gridValueStr = [grid gridValueLabelFor:gridValue];
+	if (rightGridLine != nil && rightGridLine.drawLabel) {
+	    NSString *gridValueStr = [grid gridValueLabelFor:rightGridLine.value];
 	    CGFloat textY = y + _gridValueFont.descender - _gridValueFont.xHeight/2 - 1;
 	    NSPoint point = NSMakePoint(plotRect.origin.x + plotRect.size.width + GRID_VALUE_PADDING, textY);
 	    [gridValueStr drawAtPoint:point withAttributes:attr];
@@ -224,20 +235,17 @@
 }
 
 - (void)drawSeries:(Series *)series onAxis:(Axis *)axis inPlotRect:(CGRect)plotRect withDomain:(Series *)domainSeries {
+
+    Grid *rangeGrid = axis.grid;
     NSBezierPath *line = [NSBezierPath bezierPath];
     BOOL firstPoint = YES;
-
-    // For remapping to the grid.
-    double minGridValue = axis.grid.start;
-    double gridRange = (axis.grid.lineCount - 1)*axis.grid.interval;
     
     for (int j = 0; j < series.count; j++) {
 	double domainValue = [domainSeries valueAt:j];
 	double value = [series valueAt:j];
 	
-	// XXX Doesn't handle series.count <= 1.
-	CGFloat x = plotRect.origin.x + (domainValue - domainSeries.minValue)*plotRect.size.width/domainSeries.range;
-	CGFloat y = plotRect.origin.y + (value - minGridValue)*plotRect.size.height/gridRange;
+	CGFloat x = plotRect.origin.x + [_data.domainGrid positionFor:domainValue]*plotRect.size.width;
+	CGFloat y = plotRect.origin.y + [rangeGrid positionFor:value]*plotRect.size.height;
 	NSPoint point = NSMakePoint(x, y);
 	if (firstPoint) {
 	    [line moveToPoint:point];

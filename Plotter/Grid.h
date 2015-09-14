@@ -8,27 +8,30 @@
 
 #import <Foundation/Foundation.h>
 
+@interface GridLine : NSObject
+
+@property (nonatomic,readonly) double value;
+@property (nonatomic,readonly) BOOL isZero;
+@property (nonatomic,readonly) BOOL drawLabel;
+
+@end
+
+
 // Represents a horizontal or vertical grid.
 @interface Grid : NSObject
 
-// The number of lines in the grid. Subtract one to get the number of intervals;
-@property (nonatomic) int lineCount;
-
-// Which line index represents zero, value-wise.
-@property (nonatomic) int zeroIndex;
-
-// The value between grid lines.
-@property (nonatomic) double interval;
-
-// The value of the first grid line.
-@property (nonatomic) double start;
+// Array of GridLine objects.
+@property (nonatomic) NSArray *gridLines;
 
 - (id)initForRangeWithMin:(double)minValue andMax:(double)maxValue;
-- (id)initForDomainWithMin:(double)minValue andMax:(double)maxValue;
+- (id)initForDomainWithMin:(double)minValue andMax:(double)maxValue andLog:(BOOL)log;
 
 // Only publically visible for unit testing:
 - (double)roundUp:(double)value;
 - (double)roundDown:(double)value;
+
+// Return 0.0 to 1.0 for where to plot this value.
+- (CGFloat)positionFor:(double)value;
 
 - (NSString *)gridValueLabelFor:(double)value;
 

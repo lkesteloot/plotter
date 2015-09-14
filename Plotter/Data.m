@@ -201,7 +201,7 @@
 
     // Compute the domain grid lines we'll be showing when plotting.
     Series *domainSeries = [_derivativeDomainSeries objectAtIndex:0];
-    _domainGrid = [[Grid alloc] initForDomainWithMin:domainSeries.minValue andMax:domainSeries.maxValue];
+    _domainGrid = [[Grid alloc] initForDomainWithMin:domainSeries.minValue andMax:domainSeries.maxValue andLog:domainSeries.log];
 }
 
 - (int)dataPointCount {

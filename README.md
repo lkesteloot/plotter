@@ -61,6 +61,8 @@ The options are:
 - Whether to display the derivative of the data (`derivative`). This can be specified multiple
   times to compute the second derivative, third derivative, and so on. For each derivative,
   the title in the legend has an apostrophe appended to it.
+- Whether to draw a log plot (`log`). This currently only works on the domain. All values
+  must be positive for log plots.
 
 To actually run the binary from the command line, you'll have to add the build directory
 to your path, copy the binary to a directory already in your path, or run it

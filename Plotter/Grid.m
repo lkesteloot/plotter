@@ -12,8 +12,29 @@
 static double VALID_VALUES[] = { 1, 1.5, 2, 3, 4, 5, 6, 7.5, 8, 10 };
 static int VALID_VALUE_COUNT = sizeof(VALID_VALUES)/sizeof(VALID_VALUES[0]);
 
+@implementation GridLine
+
+- (id)initWithValue:(double)value isZero:(BOOL)isZero drawLabel:(BOOL)drawLabel {
+    self = [super init];
+
+    if (self) {
+	_value = value;
+	_isZero = isZero;
+	_drawLabel = drawLabel;
+    }
+
+    return self;
+}
+
+@end
+
 @interface Grid ()
 
+@property (nonatomic, readonly) BOOL log;
+@property (nonatomic) double minValue;
+@property (nonatomic) double maxValue;
+@property (nonatomic) double logMinValue;
+@property (nonatomic) double logMaxValue;
 @property (nonatomic) NSNumberFormatter *gridValueFormatter;
 
 @end
@@ -24,6 +45,10 @@ static int VALID_VALUE_COUNT = sizeof(VALID_VALUES)/sizeof(VALID_VALUES[0]);
     self = [super init];
 
     if (self) {
+	_gridLines = [NSMutableArray array];
+	_logMinValue = 0;
+	_logMaxValue = 0;
+
 	_gridValueFormatter = [[NSNumberFormatter alloc] init];
 	[_gridValueFormatter setNumberStyle:NSNumberFormatterDecimalStyle];
 	[_gridValueFormatter setGroupingSize:3];
@@ -39,6 +64,10 @@ static int VALID_VALUE_COUNT = sizeof(VALID_VALUES)/sizeof(VALID_VALUES[0]);
     self = [self init];
 
     if (self) {
+	NSMutableArray *gridLines = (NSMutableArray *) _gridLines;
+
+	_log = NO;
+
 	// Unlike the domain, the data lines don't necessary go all the way to the
 	// top and bottom of the plot area. We always force the range to have
 	// five grid lines spaced evenly, and we scale the data to fit. For each axis:
@@ -48,7 +77,7 @@ static int VALID_VALUE_COUNT = sizeof(VALID_VALUES)/sizeof(VALID_VALUES[0]);
 	// - The data should be as large as possible vertically.
 	// - If the range of the range is 0, include 0 in the plot.
 
-	_lineCount = 5;
+	int lineCount = 5;
 
 	// Figure out the range (max - min). It must never be zero.
 	double range = maxValue - minValue;
@@ -62,63 +91,116 @@ static int VALID_VALUE_COUNT = sizeof(VALID_VALUES)/sizeof(VALID_VALUES[0]);
 	}
 
 	// Initial guess for an interval.
-	double interval = range / (_lineCount - 1);
+	double interval = range / (lineCount - 1);
 
 	// Round up to the nearest nice number.
 	interval = [self roundUp:interval];
 	double start = floor(minValue/interval)*interval;
 
 	// See if we fit the range.
-	while (start + interval*(_lineCount - 1) < maxValue) {
+	while (start + interval*(lineCount - 1) < maxValue) {
 	    // The floor for "start" made it so that we don't fit.
 	    // Add that error to our range.
 	    double newRange = range + minValue - start;
 
 	    // And recompute.
-	    interval = newRange / (_lineCount - 1);
+	    interval = newRange / (lineCount - 1);
 	    interval = [self roundUp:interval];
 	    start = floor(minValue/interval)*interval;
 	}
 
-	_interval = interval;
-	_start = start;
-	_zeroIndex = (int) floor((0 - _start)/interval + 0.5);
+	int zeroIndex = (int) floor((0 - start)/interval + 0.5);
+
+	for (int i = 0; i < lineCount; i++) {
+	    double value = start + interval*i;
+	    [gridLines addObject:[[GridLine alloc] initWithValue:value isZero:(i == zeroIndex) drawLabel:YES]];
+	}
+
+	_minValue = start;
+	_maxValue = start + (lineCount - 1)*interval;
     }
 
     return self;
 }
 
-- (id)initForDomainWithMin:(double)minValue andMax:(double)maxValue {
+- (id)initForDomainWithMin:(double)minValue andMax:(double)maxValue andLog:(BOOL)log {
     self = [self init];
 
     if (self) {
 	// The data lines themselves always go from the
-	// far left to the far right of the plot. We choose grid value intervals
-	// such that:
-	//
-	// - There are as few grid lines as possible.
-	// - There are always at least five grid lines.
-	// - The intervals are chosen from a set of nice numbers.
-	// - The intervals go through 0.
+	// far left to the far right of the plot.
+	_minValue = minValue;
+	_maxValue = maxValue;
+	_log = log;
 
-	// Compute the range of values.
-	double range = maxValue - minValue;
-	if (range == 0) {
-	    range = 4;
+	NSMutableArray *gridLines = (NSMutableArray *) _gridLines;
+
+	if (_log) {
+	    // We have one grid line for each most-significant digit
+	    // (e.g., 1, 2, 3, ..., 9, 10, 20, 30, ..., 80, 90, 100, 200, ...).
+
+	    if (minValue <= 0 || maxValue <= 0) {
+		NSLog(@"Log plots require positive values.");
+		exit(1);
+	    }
+
+	    // Compute the first line we draw.
+
+	    // E.g., 343 will return 100 here.
+	    double decade = pow(10, floor(log10(minValue)));
+
+	    // E.g., 343 will return 4 here.
+	    int digit = (int) ceil(minValue / decade);
+
+	    _logMinValue = log10(minValue);
+	    _logMaxValue = log10(maxValue);
+
+	    while (YES) {
+		if (digit == 10) {
+		    digit = 1;
+		    decade *= 10;
+		}
+
+		double value = digit*decade;
+		if (value > maxValue) {
+		    break;
+		}
+
+		[gridLines addObject:[[GridLine alloc] initWithValue:value isZero:NO drawLabel:(digit == 1)]];
+		digit += 1;
+	    }
+	} else {
+	    // We choose grid value intervals such that:
+	    //
+	    // - There are as few grid lines as possible.
+	    // - There are always at least five grid lines.
+	    // - The intervals are chosen from a set of nice numbers.
+	    // - The intervals go through 0.
+
+	    // Compute the range of values.
+	    double range = maxValue - minValue;
+	    if (range == 0) {
+		range = 4;
+	    }
+
+	    // At least five lines.
+	    double interval = [self roundDown:range / 4];
+
+	    // Start after the min value.
+	    double start = ceil(minValue/interval)*interval;
+
+	    // End after the max value.
+	    double last = floor(maxValue/interval)*interval;
+	    int lineCount = (int) floor((last - start)/interval + 0.5) + 1;
+
+	    // Figure out the zero line, if any.
+	    int zeroIndex = (int) floor((0 - start)/interval + 0.5);
+
+	    for (int i = 0; i < lineCount; i++) {
+		double value = start + interval*i;
+		[gridLines addObject:[[GridLine alloc] initWithValue:value isZero:(i == zeroIndex) drawLabel:YES]];
+	    }
 	}
-
-	// At least five lines.
-	_interval = [self roundDown:range / 4];
-
-	// Start after the min value.
-	_start = ceil(minValue/_interval)*_interval;
-
-	// End after the max value.
-	double last = floor(maxValue/_interval)*_interval;
-	_lineCount = (int) floor((last - _start)/_interval + 0.5) + 1;
-
-	// Figure out the zero line, if any.
-	_zeroIndex = (int) floor((0 - _start)/_interval + 0.5);
     }
 
     return self;
@@ -158,6 +240,20 @@ static int VALID_VALUE_COUNT = sizeof(VALID_VALUES)/sizeof(VALID_VALUES[0]);
     value *= decade;
 
     return value;
+}
+
+- (CGFloat)positionFor:(double)value {
+    double position;
+
+    if (_log) {
+	double logValue = log10(value);
+
+	position = (logValue - _logMinValue) / (_logMaxValue - _logMinValue);
+    } else {
+	position = (value - _minValue) / (_maxValue - _minValue);
+    }
+
+    return position;
 }
 
 - (NSString *)gridValueLabelFor:(double)value {

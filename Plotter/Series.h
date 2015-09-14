@@ -25,6 +25,7 @@ typedef NS_ENUM(NSInteger, SeriesType) {
 @property (nonatomic,readonly) BOOL hide;
 @property (nonatomic,readonly) SeriesType seriesType;
 @property (nonatomic,readonly) int derivative;
+@property (nonatomic,readonly) BOOL log;
 @property (nonatomic) BOOL isImplicit;
 
 - (id)init;

@@ -37,6 +37,7 @@ static NSCharacterSet *TERMINATE_OPTION_CHARACTER_SET = nil;
 	_hide = NO;
 	_seriesType = SeriesTypeLeft;
 	_derivative = 0;
+	_log = NO;
 	_isImplicit = NO;
 
 	// Initialize static objects.
@@ -83,6 +84,7 @@ static NSCharacterSet *TERMINATE_OPTION_CHARACTER_SET = nil;
 	_hide = other->_hide;
 	_seriesType = other->_seriesType;
 	_derivative = other->_derivative;
+	_log = other->_log;
 	_isImplicit = other->_isImplicit;
     }
     
@@ -127,6 +129,8 @@ static NSCharacterSet *TERMINATE_OPTION_CHARACTER_SET = nil;
 		    _seriesType = SeriesTypeDomain;
 		} else if ([option isEqualToString:@"derivative"]) {
 		    _derivative += 1;
+		} else if ([option isEqualToString:@"log"]) {
+		    _log = YES;
 		} else {
 		    NSLog(@"Unknown header option: %@", option);
 		}
