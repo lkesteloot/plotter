@@ -55,51 +55,70 @@
     XCTAssertEqual([grid roundDown:1234], 1000);
 }
 
+- (void)checkGridLine:(Grid *)grid atIndex:(int)index hasValue:(double)value isZero:(BOOL)isZero drawLabel:(BOOL)drawLabel {
+
+    GridLine *gridLine = [grid.gridLines objectAtIndex:index];
+
+    XCTAssertEqual(gridLine.value, value);
+    XCTAssertEqual(gridLine.isZero, isZero);
+    XCTAssertEqual(gridLine.drawLabel, drawLabel);
+}
+
 - (void)testGridRange {
     Grid *grid;
 
     grid = [[Grid alloc] initForRangeWithMin:0 andMax:5];
-    XCTAssertEqual(grid.interval, 1.5);
-    XCTAssertEqual(grid.start, 0);
-    XCTAssertEqual(grid.zeroIndex, 0);
+    XCTAssertEqual(grid.gridLines.count, 5);
+    [self checkGridLine:grid atIndex:0 hasValue:0 isZero:YES drawLabel:YES];
+    [self checkGridLine:grid atIndex:1 hasValue:1.5 isZero:NO drawLabel:YES];
+    [self checkGridLine:grid atIndex:2 hasValue:3 isZero:NO drawLabel:YES];
 
     grid = [[Grid alloc] initForRangeWithMin:-1 andMax:24];
-    XCTAssertEqual(grid.interval, 8);
-    XCTAssertEqual(grid.start, -8);
-    XCTAssertEqual(grid.zeroIndex, 1);
+    XCTAssertEqual(grid.gridLines.count, 5);
+    [self checkGridLine:grid atIndex:0 hasValue:-8 isZero:NO drawLabel:YES];
+    [self checkGridLine:grid atIndex:1 hasValue:0 isZero:YES drawLabel:YES];
+    [self checkGridLine:grid atIndex:2 hasValue:8 isZero:NO drawLabel:YES];
 
     grid = [[Grid alloc] initForRangeWithMin:-92.5853 andMax:2450.74];
-    XCTAssertEqual(grid.interval, 1000);
-    XCTAssertEqual(grid.start, -1000);
-    XCTAssertEqual(grid.zeroIndex, 1);
+    XCTAssertEqual(grid.gridLines.count, 5);
+    [self checkGridLine:grid atIndex:0 hasValue:-1000 isZero:NO drawLabel:YES];
+    [self checkGridLine:grid atIndex:1 hasValue:0 isZero:YES drawLabel:YES];
+    [self checkGridLine:grid atIndex:2 hasValue:1000 isZero:NO drawLabel:YES];
 }
 
 - (void)testGridDomain {
     Grid *grid;
 
-    grid = [[Grid alloc] initForDomainWithMin:0 andMax:4];
-    XCTAssertEqual(grid.lineCount, 5);
-    XCTAssertEqual(grid.interval, 1);
-    XCTAssertEqual(grid.start, 0);
-    XCTAssertEqual(grid.zeroIndex, 0);
+    grid = [[Grid alloc] initForDomainWithMin:0 andMax:4 andLog:NO];
+    XCTAssertEqual(grid.gridLines.count, 5);
+    [self checkGridLine:grid atIndex:0 hasValue:0 isZero:YES drawLabel:YES];
+    [self checkGridLine:grid atIndex:1 hasValue:1 isZero:NO drawLabel:YES];
+    [self checkGridLine:grid atIndex:2 hasValue:2 isZero:NO drawLabel:YES];
 
-    grid = [[Grid alloc] initForDomainWithMin:0 andMax:4.1];
-    XCTAssertEqual(grid.lineCount, 5);
-    XCTAssertEqual(grid.interval, 1);
-    XCTAssertEqual(grid.start, 0);
-    XCTAssertEqual(grid.zeroIndex, 0);
+    grid = [[Grid alloc] initForDomainWithMin:0 andMax:4.1 andLog:NO];
+    XCTAssertEqual(grid.gridLines.count, 5);
+    [self checkGridLine:grid atIndex:0 hasValue:0 isZero:YES drawLabel:YES];
+    [self checkGridLine:grid atIndex:1 hasValue:1 isZero:NO drawLabel:YES];
+    [self checkGridLine:grid atIndex:2 hasValue:2 isZero:NO drawLabel:YES];
 
-    grid = [[Grid alloc] initForDomainWithMin:-0.1 andMax:4];
-    XCTAssertEqual(grid.lineCount, 5);
-    XCTAssertEqual(grid.interval, 1);
-    XCTAssertEqual(grid.start, 0);
-    XCTAssertEqual(grid.zeroIndex, 0);
+    grid = [[Grid alloc] initForDomainWithMin:-0.1 andMax:4 andLog:NO];
+    XCTAssertEqual(grid.gridLines.count, 5);
+    [self checkGridLine:grid atIndex:0 hasValue:0 isZero:YES drawLabel:YES];
+    [self checkGridLine:grid atIndex:1 hasValue:1 isZero:NO drawLabel:YES];
+    [self checkGridLine:grid atIndex:2 hasValue:2 isZero:NO drawLabel:YES];
 
-    grid = [[Grid alloc] initForDomainWithMin:-0.1 andMax:30.1];
-    XCTAssertEqual(grid.lineCount, 5);
-    XCTAssertEqual(grid.interval, 7.5);
-    XCTAssertEqual(grid.start, 0);
-    XCTAssertEqual(grid.zeroIndex, 0);
+    grid = [[Grid alloc] initForDomainWithMin:-0.1 andMax:30.1 andLog:NO];
+    XCTAssertEqual(grid.gridLines.count, 5);
+    [self checkGridLine:grid atIndex:0 hasValue:0 isZero:YES drawLabel:YES];
+    [self checkGridLine:grid atIndex:1 hasValue:7.5 isZero:NO drawLabel:YES];
+    [self checkGridLine:grid atIndex:2 hasValue:15 isZero:NO drawLabel:YES];
+
+    grid = [[Grid alloc] initForDomainWithMin:1 andMax:1000 andLog:YES];
+    XCTAssertEqual(grid.gridLines.count, 28);
+    [self checkGridLine:grid atIndex:0 hasValue:1 isZero:NO drawLabel:YES];
+    [self checkGridLine:grid atIndex:1 hasValue:2 isZero:NO drawLabel:NO];
+    [self checkGridLine:grid atIndex:2 hasValue:3 isZero:NO drawLabel:NO];
+    [self checkGridLine:grid atIndex:27 hasValue:1000 isZero:NO drawLabel:YES];
 }
 
 - (void)testGridValueStrings {
