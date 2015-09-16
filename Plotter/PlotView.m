@@ -173,8 +173,11 @@
     // Will be the same for all grids (5).
     NSUInteger lineCount = [grid.gridLines count];
 
-    NSDictionary *leftAttr = [self makeRangeLabelAttrForAxis:_data.leftAxis];
-    NSDictionary *rightAttr = [self makeRangeLabelAttrForAxis:_data.rightAxis];
+    // Figure out whether we're displaying on both axes.
+    BOOL haveBothAxes = _data.leftAxis.seriesArray.count > 0 && _data.rightAxis.seriesArray.count > 0;
+
+    NSDictionary *leftAttr = [self makeRangeLabelAttrForAxis:_data.leftAxis haveBothAxes:haveBothAxes];
+    NSDictionary *rightAttr = [self makeRangeLabelAttrForAxis:_data.rightAxis haveBothAxes:haveBothAxes];
 
     for (int i = 0; i < lineCount; i++) {
 	GridLine *leftGridLine = [leftGrid.gridLines objectAtIndex:i];
@@ -183,13 +186,27 @@
 
 	int y = plotRect.origin.y + [grid positionFor:gridLine.value]*plotRect.size.height;
 
-	if ((leftGridLine != nil && leftGridLine.isZero) ||
-	    (rightGridLine != nil && rightGridLine.isZero)) {
-
-	    [_axisColor set];
+	NSColor *gridLineColor;
+	if (leftGridLine.isZero && rightGridLine.isZero) {
+	    gridLineColor = _axisColor;
+	} else if (leftGridLine.isZero) {
+	    if (haveBothAxes && _data.leftAxis.seriesArray.count == 1) {
+		Series *series = [_data.leftAxis.seriesArray objectAtIndex:0];
+		gridLineColor = [_gridColor blendedColorWithFraction:0.4 ofColor:series.color];
+	    } else {
+		gridLineColor = _axisColor;
+	    }
+	} else if (rightGridLine.isZero) {
+	    if (haveBothAxes && _data.rightAxis.seriesArray.count == 1) {
+		Series *series = [_data.rightAxis.seriesArray objectAtIndex:0];
+		gridLineColor = [_gridColor blendedColorWithFraction:0.4 ofColor:series.color];
+	    } else {
+		gridLineColor = _axisColor;
+	    }
 	} else {
-	    [_gridColor set];
+	    gridLineColor = _gridColor;
 	}
+	[gridLineColor set];
 
 	NSBezierPath *path = [NSBezierPath bezierPath];
 	[path moveToPoint:NSMakePoint(plotRect.origin.x, y)];
@@ -216,16 +233,12 @@
 }
 
 // Return an attribute dictionary for the labels for this axis.
-- (NSDictionary *)makeRangeLabelAttrForAxis:(Axis *)axis {
+- (NSDictionary *)makeRangeLabelAttrForAxis:(Axis *)axis haveBothAxes:(BOOL)haveBothAxes {
     NSColor *textColor;
 
     // If there's only one series for an axis, draw the labels in that color
     // to make it easier to visually link them.
-    if (_data.leftAxis.seriesArray.count > 0 &&
-	_data.rightAxis.seriesArray.count > 0 &&
-	axis != nil &&
-	axis.seriesArray.count == 1) {
-
+    if (haveBothAxes && axis.seriesArray.count == 1) {
 	Series *series = [axis.seriesArray objectAtIndex:0];
 	textColor = series.color;
     } else {
