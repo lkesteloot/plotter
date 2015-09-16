@@ -173,10 +173,8 @@
     // Will be the same for all grids (5).
     NSUInteger lineCount = [grid.gridLines count];
 
-    NSDictionary *attr = @{
-			   NSForegroundColorAttributeName: _gridValueColor,
-			   NSFontAttributeName: _gridValueFont
-			   };
+    NSDictionary *leftAttr = [self makeRangeLabelAttrForAxis:_data.leftAxis];
+    NSDictionary *rightAttr = [self makeRangeLabelAttrForAxis:_data.rightAxis];
 
     for (int i = 0; i < lineCount; i++) {
 	GridLine *leftGridLine = [leftGrid.gridLines objectAtIndex:i];
@@ -201,10 +199,10 @@
 	// Left grid values.
 	if (leftGridLine != nil && leftGridLine.drawLabel) {
 	    NSString *gridValueStr = [grid gridValueLabelFor:gridLine.value];
-	    NSSize size = [gridValueStr sizeWithAttributes:attr];
+	    NSSize size = [gridValueStr sizeWithAttributes:leftAttr];
 	    CGFloat textY = y + _gridValueFont.descender - _gridValueFont.xHeight/2 - 1;
 	    NSPoint point = NSMakePoint(plotRect.origin.x - size.width - GRID_VALUE_PADDING, textY);
-	    [gridValueStr drawAtPoint:point withAttributes:attr];
+	    [gridValueStr drawAtPoint:point withAttributes:leftAttr];
 	}
 
 	// Right grid values.
@@ -212,9 +210,32 @@
 	    NSString *gridValueStr = [grid gridValueLabelFor:rightGridLine.value];
 	    CGFloat textY = y + _gridValueFont.descender - _gridValueFont.xHeight/2 - 1;
 	    NSPoint point = NSMakePoint(plotRect.origin.x + plotRect.size.width + GRID_VALUE_PADDING, textY);
-	    [gridValueStr drawAtPoint:point withAttributes:attr];
+	    [gridValueStr drawAtPoint:point withAttributes:rightAttr];
 	}
     }
+}
+
+// Return an attribute dictionary for the labels for this axis.
+- (NSDictionary *)makeRangeLabelAttrForAxis:(Axis *)axis {
+    NSColor *textColor;
+
+    // If there's only one series for an axis, draw the labels in that color
+    // to make it easier to visually link them.
+    if (_data.leftAxis.seriesArray.count > 0 &&
+	_data.rightAxis.seriesArray.count > 0 &&
+	axis != nil &&
+	axis.seriesArray.count == 1) {
+
+	Series *series = [axis.seriesArray objectAtIndex:0];
+	textColor = series.color;
+    } else {
+	textColor = _gridValueColor;
+    }
+
+    return @{
+	     NSForegroundColorAttributeName: textColor,
+	     NSFontAttributeName: _gridValueFont
+	     };
 }
 
 - (void)drawGridInPlotRect:(CGRect)plotRect {

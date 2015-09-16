@@ -1,0 +1,10 @@
+
+When centering numbers in domain, center based on positive value so that
+negative sign doesn't throw it off.
+
+Draw first and last line of log graph if there are no numbers shown.
+
+Header options:
+    - Reference to other series.
+    - Log (range).
+
