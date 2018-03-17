@@ -1,0 +1,9 @@
+# These store various Xcode user interface state.
+**/project.xcworkspace/xcuserdata/*.xcuserdatad
+**/xcuserdata/*.xcuserdatad/UserInterfaceState.xcuserstate
+
+# These store Xcode breakpoints and such.
+**/xcuserdata/*.xcuserdatad/xcdebugger
+
+# Developer-specific information about VCS.
+*.xccheckout
