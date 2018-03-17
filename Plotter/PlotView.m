@@ -150,7 +150,7 @@
 
 	// Draw labels.
 	if (gridLine.drawLabel) {
-	    NSString *gridValueStr = [grid gridValueLabelFor:gridLine.value];
+	    NSString *gridValueStr = [grid gridValueLabelFor:gridLine.value isDate:series.date];
 	    NSSize size = [gridValueStr sizeWithAttributes:attr];
 	    CGFloat textX = x - size.width/2;
 	    CGFloat textY = plotRect.origin.x - _gridValueFont.ascender + _gridValueFont.descender - GRID_VALUE_PADDING;
@@ -215,7 +215,7 @@
 
 	// Left grid values.
 	if (leftGridLine != nil && leftGridLine.drawLabel) {
-	    NSString *gridValueStr = [grid gridValueLabelFor:gridLine.value];
+	    NSString *gridValueStr = [grid gridValueLabelFor:gridLine.value isDate:NO];
 	    NSSize size = [gridValueStr sizeWithAttributes:leftAttr];
 	    CGFloat textY = y + _gridValueFont.descender - _gridValueFont.xHeight/2 - 1;
 	    NSPoint point = NSMakePoint(plotRect.origin.x - size.width - GRID_VALUE_PADDING, textY);
@@ -224,7 +224,7 @@
 
 	// Right grid values.
 	if (rightGridLine != nil && rightGridLine.drawLabel) {
-	    NSString *gridValueStr = [grid gridValueLabelFor:rightGridLine.value];
+	    NSString *gridValueStr = [grid gridValueLabelFor:rightGridLine.value isDate:NO];
 	    CGFloat textY = y + _gridValueFont.descender - _gridValueFont.xHeight/2 - 1;
 	    NSPoint point = NSMakePoint(plotRect.origin.x + plotRect.size.width + GRID_VALUE_PADDING, textY);
 	    [gridValueStr drawAtPoint:point withAttributes:rightAttr];
@@ -269,11 +269,12 @@
 }
 
 - (void)drawSeries:(Series *)series onAxis:(Axis *)axis inPlotRect:(CGRect)plotRect withDomain:(Series *)domainSeries {
-
     Grid *rangeGrid = axis.grid;
-    NSBezierPath *line = [NSBezierPath bezierPath];
     BOOL firstPoint = YES;
-    
+    NSPoint previousPoint = NSMakePoint(0, 0);
+
+    [series.color set];
+    [NSBezierPath setDefaultLineWidth:2];
     for (int j = 0; j < series.count; j++) {
 	double domainValue = [domainSeries valueAt:j];
 	double value = [series valueAt:j];
@@ -282,15 +283,12 @@
 	CGFloat y = plotRect.origin.y + [rangeGrid positionFor:value]*plotRect.size.height;
 	NSPoint point = NSMakePoint(x, y);
 	if (firstPoint) {
-	    [line moveToPoint:point];
 	    firstPoint = NO;
 	} else {
-	    [line lineToPoint:point];
+	    [NSBezierPath strokeLineFromPoint:previousPoint toPoint:point];
 	}
+	previousPoint = point;
     }
-    [line setLineWidth:2.0];
-    [series.color set];
-    [line stroke];
 }
 
 - (void)drawLegend:(NSRect)plotRect {

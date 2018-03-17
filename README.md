@@ -63,6 +63,8 @@ The options are:
   the title in the legend has an apostrophe appended to it.
 - Whether to draw a log plot (`log`). This currently only works on the domain. All values
   must be positive for log plots.
+- Whether to domain values should be considered to be years (`date`). This draws the
+  four-digit numbers as "2018" instead of "2,018". Does not apply to ranges.
 
 To actually run the binary from the command line, you'll have to add the build directory
 to your path, copy the binary to a directory already in your path, or run it

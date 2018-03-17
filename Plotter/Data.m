@@ -11,8 +11,9 @@
 @interface Data () {
     NSMutableArray *_seriesArray;
 
-    // Used during loading.
+    // What column to write to next.
     int _currentColumn;
+    // Whether we're about to read the first line in the input.
     BOOL _firstLine;
     
     // The number of data points in any series (all the same).
@@ -172,6 +173,7 @@
     
     // Generate domain series for derivative range series.
     for (Series *series in _seriesArray) {
+        // Number of derivatives that this series requires.
 	int derivative = series.derivative;
 	
 	// Compute derivatives up to needed one, so we don't have any nils, which aren't allowed by NSArray.

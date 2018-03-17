@@ -11,12 +11,11 @@
 #import "Axis.h"
 #import "Grid.h"
 
+// All the data we load from input.
 @interface Data : NSObject
 
 // To fill the data.
 - (void)newLine:(NSString *)line;
-- (void)newRow;
-- (void)newValue:(double)value;
 
 // To process the data once filled.
 - (void)processData;

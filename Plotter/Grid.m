@@ -82,10 +82,10 @@ static int VALID_VALUE_COUNT = sizeof(VALID_VALUES)/sizeof(VALID_VALUES[0]);
 	// Figure out the range (max - min). It must never be zero.
 	double range = maxValue - minValue;
 	if (range == 0) {
-	    // Include 0 in the plot.
+	    // All data is the same. Include 0 in the plot.
 	    range = fabs(minValue);
 	    if (range == 0) {
-		// Integer grid lines.
+		// All data is zero. Just pick integer grid lines.
 		range = 4;
 	    }
 	}
@@ -149,7 +149,7 @@ static int VALID_VALUE_COUNT = sizeof(VALID_VALUES)/sizeof(VALID_VALUES[0]);
 	    // E.g., 343 will return 100 here.
 	    double decade = pow(10, floor(log10(minValue)));
 
-	    // E.g., 343 will return 4 here.
+	    // E.g., 343 will return 4 here (for "400").
 	    int digit = (int) ceil(minValue / decade);
 
 	    _logMinValue = log10(minValue);
@@ -206,6 +206,8 @@ static int VALID_VALUE_COUNT = sizeof(VALID_VALUES)/sizeof(VALID_VALUES[0]);
     return self;
 }
 
+// Round up to the next higher (or equal) value in VALID_VALUES (accounting
+// for order of magnitude).
 - (double)roundUp:(double)value {
     double decade = pow(10, floor(log10(value)));
 
@@ -224,6 +226,8 @@ static int VALID_VALUE_COUNT = sizeof(VALID_VALUES)/sizeof(VALID_VALUES[0]);
     return value;
 }
 
+// Round down to the next lower (or equal) value in VALID_VALUES (accounting
+// for order of magnitude).
 - (double)roundDown:(double)value {
     double decade = pow(10, floor(log10(value)));
 
@@ -256,7 +260,12 @@ static int VALID_VALUE_COUNT = sizeof(VALID_VALUES)/sizeof(VALID_VALUES[0]);
     return position;
 }
 
-- (NSString *)gridValueLabelFor:(double)value {
+- (NSString *)gridValueLabelFor:(double)value isDate:(BOOL)isDate {
+    if (isDate) {
+	[_gridValueFormatter setGroupingSize:0];
+    } else {
+	[_gridValueFormatter setGroupingSize:3];
+    }
     return [_gridValueFormatter stringFromNumber:[NSNumber numberWithDouble:value]];
 }
 

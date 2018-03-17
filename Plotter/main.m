@@ -9,5 +9,6 @@
 #import <Cocoa/Cocoa.h>
 
 int main(int argc, const char * argv[]) {
-	return NSApplicationMain(argc, argv);
+    // NSLog(@"%s", argv[0]);
+    return NSApplicationMain(argc, argv);
 }

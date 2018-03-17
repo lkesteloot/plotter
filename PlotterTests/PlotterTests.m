@@ -124,12 +124,15 @@
 - (void)testGridValueStrings {
     Grid *grid = [[Grid alloc] init];
 
-    XCTAssertEqualObjects([grid gridValueLabelFor:0], @"0");
-    XCTAssertEqualObjects([grid gridValueLabelFor:5], @"5");
-    XCTAssertEqualObjects([grid gridValueLabelFor:1234], @"1,234");
-    XCTAssertEqualObjects([grid gridValueLabelFor:0.1], @"0.1");
-    XCTAssertEqualObjects([grid gridValueLabelFor:0.23], @"0.23");
-    XCTAssertEqualObjects([grid gridValueLabelFor:100.1], @"100.1");
+    XCTAssertEqualObjects([grid gridValueLabelFor:0 isDate:NO], @"0");
+    XCTAssertEqualObjects([grid gridValueLabelFor:5 isDate:NO], @"5");
+    XCTAssertEqualObjects([grid gridValueLabelFor:1234 isDate:NO], @"1,234");
+    XCTAssertEqualObjects([grid gridValueLabelFor:0.1 isDate:NO], @"0.1");
+    XCTAssertEqualObjects([grid gridValueLabelFor:0.23 isDate:NO], @"0.23");
+    XCTAssertEqualObjects([grid gridValueLabelFor:100.1 isDate:NO], @"100.1");
+
+    XCTAssertEqualObjects([grid gridValueLabelFor:2018 isDate:NO], @"2,018");
+    XCTAssertEqualObjects([grid gridValueLabelFor:2018 isDate:YES], @"2018");
 }
 
 @end
