@@ -1,0 +1,127 @@
+#!/usr/bin/python
+
+# Make our icon procedurally.
+
+import sys
+import math
+from PIL import Image, ImageDraw, ImageFilter
+
+WIDTH = 1024
+HEIGHT = 1024
+MARGIN = 120
+RADIUS = 50
+SHADOW_SIZE = 50
+SHADOW_OFFSET = 10
+INTERNAL_WIDTH = WIDTH - 2*MARGIN
+INTERNAL_HEIGHT = HEIGHT - 2*MARGIN
+AXIS_LINE_WIDTH = 16
+DATA_LINE_WIDTH = 32
+
+# Return fraction "a" of c2 and "1 - a" of c1.
+def blend_color(c1, c2, a):
+    return (
+            int((1 - a)*c1[0] + a*c2[0] + 0.5),
+            int((1 - a)*c1[1] + a*c2[1] + 0.5),
+            int((1 - a)*c1[2] + a*c2[2] + 0.5),
+            int((1 - a)*c1[3] + a*c2[3] + 0.5))
+
+# Match colors in PlotView.m.
+TRANSPARENT_COLOR = (0, 0, 0, 0)
+BACKGROUND_COLOR = (51, 46, 36, 255)
+WHITE_COLOR = (255, 255, 255, 255)
+GREEN_COLOR = (0, 255, 0, 255)
+YELLOW_COLOR = (255, 255, 0, 255)
+AXIS_COLOR = blend_color(BACKGROUND_COLOR, WHITE_COLOR, 0.6)
+DATA_COLOR1 = blend_color(BACKGROUND_COLOR, GREEN_COLOR, 0.4)
+DATA_COLOR2 = blend_color(BACKGROUND_COLOR, YELLOW_COLOR, 0.4)
+
+def func1(x):
+    internal_x = x - MARGIN
+    t = 4*float(internal_x - INTERNAL_WIDTH/2)/INTERNAL_WIDTH
+    return int(INTERNAL_HEIGHT/2 - math.sin(t)*INTERNAL_HEIGHT/2*0.75 + 0.5)
+
+def func2(x):
+    internal_x = x - MARGIN
+    t = 4*float(internal_x - INTERNAL_WIDTH/2)/INTERNAL_WIDTH
+    return int(INTERNAL_HEIGHT/2 - math.cos(t)*INTERNAL_HEIGHT/2*0.75 + 0.5)
+
+def draw_function(draw, fn, color, dx):
+    for x in range(WIDTH):
+        location = (x, MARGIN + fn(x))
+        next_location = (x + dx, MARGIN + fn(x + dx))
+        draw.line([location, next_location], fill=color, width=DATA_LINE_WIDTH)
+
+def draw_rounded_rect(draw, xy, radius, color):
+    # External points.
+    x0 = xy[0][0]
+    y0 = xy[0][1]
+    x1 = xy[1][0]
+    y1 = xy[1][1]
+
+    # Inside radius.
+    rx0 = xy[0][0] + radius
+    ry0 = xy[0][1] + radius
+    rx1 = xy[1][0] - radius
+    ry1 = xy[1][1] - radius
+
+    # Inside diameter.
+    dx0 = xy[0][0] + radius*2
+    dy0 = xy[0][1] + radius*2
+    dx1 = xy[1][0] - radius*2
+    dy1 = xy[1][1] - radius*2
+
+    # Corners.
+    draw.pieslice([(x0, y0), (dx0, dy0)], 180, 270, fill=color)
+    draw.pieslice([(dx1, y0), (x1, dy0)], 270, 360, fill=color)
+    draw.pieslice([(x0, dy1), (dx0, y1)], 90, 180, fill=color)
+    draw.pieslice([(dx1, dy1), (x1, y1)], 0, 90, fill=color)
+
+    # Center.
+    draw.rectangle([(rx0, y0), (rx1, y1)], fill=color)
+    draw.rectangle([(x0, ry0), (rx0, ry1)], fill=color)
+    draw.rectangle([(rx1, ry0), (x1, ry1)], fill=color)
+
+def make_icon(pathname):
+    image = Image.new("RGBA", (WIDTH, HEIGHT))
+
+    draw = ImageDraw.Draw(image)
+
+    # Background.
+    draw.rectangle([(0, 0), (WIDTH, HEIGHT)], fill=BACKGROUND_COLOR)
+
+    # Axes.
+    draw.line([(WIDTH/2, 0), (WIDTH/2, HEIGHT)], fill=AXIS_COLOR, width=AXIS_LINE_WIDTH)
+    draw.line([(0, HEIGHT/2), (WIDTH, HEIGHT/2)], fill=AXIS_COLOR, width=AXIS_LINE_WIDTH)
+
+    # Data.
+    draw_function(draw, func2, DATA_COLOR2, 3)
+    draw_function(draw, func1, DATA_COLOR1, 3) # Prefer green on top.
+    del draw
+
+    # Make alpha mask.
+    mask = Image.new("L", image.size, 0)
+    mask_draw = ImageDraw.Draw(mask)
+    draw_rounded_rect(mask_draw, [(MARGIN, MARGIN), (WIDTH - MARGIN, HEIGHT - MARGIN)],
+            RADIUS, 255)
+    del mask_draw
+    image.putalpha(mask)
+
+    # Blur the mask to make the shadow.
+    mask = mask.filter(ImageFilter.GaussianBlur(SHADOW_SIZE))
+    shadow = Image.new("RGBA", image.size, color=(128, 128, 128, 255))
+    shadow.putalpha(mask)
+    shadow = shadow.offset(0, SHADOW_OFFSET)
+    image = Image.alpha_composite(shadow, image)
+
+    image.save(pathname)
+
+def main():
+    if len(sys.argv) != 2:
+        sys.stderr.write("Usage: %s out.png\n" % (sys.argv[0],))
+        sys.exit(1)
+
+    pathname = sys.argv[1]
+    make_icon(pathname)
+
+if __name__ == "__main__":
+    main()
