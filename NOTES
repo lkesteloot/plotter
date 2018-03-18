@@ -1,6 +1,8 @@
 
 Fix Window warning at launch.
 
+Pop Window to front at launch.
+
 Use of linewidth is sloppy.
 
 When centering numbers in domain, center based on positive value so that
