@@ -110,7 +110,7 @@
         // Let's round to an integer, since my data is currently integers. If this changes
         // we can have the series keep track of whether all data were integers and
         // round automatically.
-        _domainClickValue = floor([grid valueForPosition:position] + 0.5);
+        _domainClickValue = [grid roundDisplayedValue:[grid valueForPosition:position]];
         self.needsDisplay = YES;
     }
 }

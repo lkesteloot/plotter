@@ -40,4 +40,7 @@
 // What text to draw at this value.
 - (NSString *)gridValueLabelFor:(double)value isDate:(BOOL)isDate;
 
+// Take a value and round it to a nice value given the range of this grid.
+- (double)roundDisplayedValue:(double)value;
+
 @end

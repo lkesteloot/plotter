@@ -28,7 +28,9 @@ static int VALID_VALUE_COUNT = sizeof(VALID_VALUES)/sizeof(VALID_VALUES[0]);
 
 @end
 
-@interface Grid ()
+@interface Grid () {
+    int _fractionDigits;
+}
 
 @property (nonatomic, readonly) BOOL log;
 @property (nonatomic) double minValue;
@@ -48,13 +50,14 @@ static int VALID_VALUE_COUNT = sizeof(VALID_VALUES)/sizeof(VALID_VALUES[0]);
 	_gridLines = [NSMutableArray array];
 	_logMinValue = 0;
 	_logMaxValue = 0;
+        _fractionDigits = 2;
 
 	_gridValueFormatter = [[NSNumberFormatter alloc] init];
 	[_gridValueFormatter setNumberStyle:NSNumberFormatterDecimalStyle];
 	[_gridValueFormatter setGroupingSize:3];
 	[_gridValueFormatter setCurrencySymbol:@""];
 	[_gridValueFormatter setLocale:[NSLocale currentLocale]];
-	[_gridValueFormatter setMaximumFractionDigits:2];
+	[_gridValueFormatter setMaximumFractionDigits:_fractionDigits];
     }
 
     return self;
@@ -118,6 +121,8 @@ static int VALID_VALUE_COUNT = sizeof(VALID_VALUES)/sizeof(VALID_VALUES[0]);
 
 	_minValue = start;
 	_maxValue = start + (lineCount - 1)*interval;
+
+        [self updateDisplayedFractionDigits];
     }
 
     return self;
@@ -201,9 +206,42 @@ static int VALID_VALUE_COUNT = sizeof(VALID_VALUES)/sizeof(VALID_VALUES[0]);
 		[gridLines addObject:[[GridLine alloc] initWithValue:value isZero:(i == zeroIndex) drawLabel:YES]];
 	    }
 	}
+
+        [self updateDisplayedFractionDigits];
     }
 
     return self;
+}
+
+- (void)updateDisplayedFractionDigits {
+    double delta;
+    if (_log) {
+        // Not tested, might not be great for log.
+        delta = _logMaxValue - _logMinValue;
+    } else {
+        delta = _maxValue - _minValue;
+    }
+
+    if (delta > 0) {
+        // Enough digits to be meaningful on a grid.
+        _fractionDigits = (int) -ceil(log10(delta)) + 1;
+        if (_fractionDigits < 0) {
+            _fractionDigits = 0;
+        }
+
+        [_gridValueFormatter setMaximumFractionDigits:_fractionDigits];
+        [_gridValueFormatter setMinimumFractionDigits:_fractionDigits];
+    }
+}
+
+- (double)roundDisplayedValue:(double)value {
+    double precision = pow(10, -_fractionDigits);
+
+    value /= precision;
+    value = floor(value + 0.5);
+    value *= precision;
+
+    return value;
 }
 
 // Round up to the next higher (or equal) value in VALID_VALUES (accounting
