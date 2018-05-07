@@ -29,6 +29,8 @@ generates this plot:
 
 ![Screenshot of Plotter](screenshot.png)
 
+Click the plot to show the value at the mouse position.
+
 You can specify a header as the first row. It is auto-detected by looking
 for alphabetic characters. Header fields _must_ be separated by tabs.
 

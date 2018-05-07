@@ -32,7 +32,10 @@
 - (double)roundDown:(double)value;
 
 // Return 0.0 to 1.0 for where to plot this value along the grid.
-- (CGFloat)positionFor:(double)value;
+- (CGFloat)positionForValue:(double)value;
+
+// Return value for a position (0.0 to 1.0) along the grid.
+- (double)valueForPosition:(CGFloat)position;
 
 // What text to draw at this value.
 - (NSString *)gridValueLabelFor:(double)value isDate:(BOOL)isDate;

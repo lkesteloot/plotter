@@ -1,5 +1,6 @@
 
 Fix Window warning at launch.
+    Bug in Xcode: http://www.openradar.me/35511761
 
 Pop Window to front at launch.
 

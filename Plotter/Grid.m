@@ -246,7 +246,7 @@ static int VALID_VALUE_COUNT = sizeof(VALID_VALUES)/sizeof(VALID_VALUES[0]);
     return value;
 }
 
-- (CGFloat)positionFor:(double)value {
+- (CGFloat)positionForValue:(double)value {
     double position;
 
     if (_log) {
@@ -258,6 +258,20 @@ static int VALID_VALUE_COUNT = sizeof(VALID_VALUES)/sizeof(VALID_VALUES[0]);
     }
 
     return position;
+}
+
+- (double)valueForPosition:(CGFloat)position {
+    double value;
+
+    if (_log) {
+        // Untested.
+        double logValue = position*(_logMaxValue - _logMinValue) + _logMinValue;
+        value = pow(10, logValue);
+    } else {
+        value = position*(_maxValue - _minValue) + _minValue;
+    }
+
+    return value;
 }
 
 - (NSString *)gridValueLabelFor:(double)value isDate:(BOOL)isDate {

@@ -12,6 +12,7 @@
 #define MARGIN 40
 #define GRID_VALUES_MARGIN 40
 #define GRID_VALUE_PADDING 10
+#define PILL_V_PADDING 1
 
 @interface PlotView () {
     Data *_data;
@@ -23,6 +24,10 @@
     NSColor *_gridValueColor;
     NSFont *_gridValueFont;
     NSArray *_plotColors;
+
+    // For clicked locations.
+    BOOL _clicked;
+    double _domainClickValue;
 }
 
 @end
@@ -41,6 +46,8 @@
     _legendFont = [NSFont fontWithName:@"Helvetica" size:14];
     _gridValueColor = [_backgroundColor blendedColorWithFraction:0.4 ofColor:[NSColor whiteColor]];
     _gridValueFont = [NSFont fontWithName:@"Helvetica" size:14];
+
+    _clicked = NO;
 }
 
 - (Data *)data {
@@ -76,6 +83,60 @@
     [self setNeedsDisplay:YES];
 }
 
+- (void)mouseDown:(NSEvent *)event {
+    [self updatePicker:event];
+}
+
+- (void)mouseDragged:(NSEvent *)event {
+    [self updatePicker:event];
+}
+
+- (void)updatePicker:(NSEvent *)event {
+    if (_data == nil || _data.seriesArray.count == 0 || _data.dataPointCount == 0) {
+        return;
+    }
+
+    // Convert to view coordinates.
+    NSPoint viewPoint = [self convertPoint:[event locationInWindow] fromView:nil];
+
+    // Plot rectangle.
+    NSRect plotRect = [self getPlotRect];
+
+    // Convert to value, based on grid.
+    Grid *grid = _data.domainGrid;
+    CGFloat position = (viewPoint.x - plotRect.origin.x)/plotRect.size.width;
+    if (position >= 0 && position <= 1) {
+        _clicked = YES;
+        // Let's round to an integer, since my data is currently integers. If this changes
+        // we can have the series keep track of whether all data were integers and
+        // round automatically.
+        _domainClickValue = floor([grid valueForPosition:position] + 0.5);
+        self.needsDisplay = YES;
+    }
+}
+
+- (NSRect)getPlotRect {
+    NSRect plotRect = [self bounds];
+
+    plotRect.origin.x += MARGIN;
+    plotRect.origin.y += MARGIN;
+    plotRect.size.width -= MARGIN*2;
+    plotRect.size.height -= MARGIN*2;
+    if (_data.leftAxis.seriesArray.count > 0) {
+        plotRect.origin.x += GRID_VALUES_MARGIN;
+        plotRect.size.width -= GRID_VALUES_MARGIN;
+    }
+    if (_data.rightAxis.seriesArray.count > 0) {
+        plotRect.size.width -= GRID_VALUES_MARGIN;
+    }
+    Series *domainSeries = [_data domainSeriesForDerivative:0];
+    if (!domainSeries.isImplicit) {
+        plotRect.origin.y += GRID_VALUES_MARGIN;
+        plotRect.size.height -= GRID_VALUES_MARGIN;
+    }
+
+    return plotRect;
+}
 
 - (void)drawRect:(NSRect)rect {
     [super drawRect:rect];
@@ -86,23 +147,7 @@
     }
     
     // Plot rectangle.
-    NSRect plotRect = [self bounds];
-    plotRect.origin.x += MARGIN;
-    plotRect.origin.y += MARGIN;
-    plotRect.size.width -= MARGIN*2;
-    plotRect.size.height -= MARGIN*2;
-    if (_data.leftAxis.seriesArray.count > 0) {
-	plotRect.origin.x += GRID_VALUES_MARGIN;
-	plotRect.size.width -= GRID_VALUES_MARGIN;
-    }
-    if (_data.rightAxis.seriesArray.count > 0) {
-	plotRect.size.width -= GRID_VALUES_MARGIN;
-    }
-    Series *domainSeries = [_data domainSeriesForDerivative:0];
-    if (!domainSeries.isImplicit) {
-	plotRect.origin.y += GRID_VALUES_MARGIN;
-	plotRect.size.height -= GRID_VALUES_MARGIN;
-    }
+    NSRect plotRect = [self getPlotRect];
 
     // Draw background.
     [_backgroundColor set];
@@ -116,6 +161,9 @@
     [self drawSeriesInAxis:_data.leftAxis inPlotRect:plotRect];
     [self drawSeriesInAxis:_data.rightAxis inPlotRect:plotRect];
 
+    // Draw the clicked point.
+    [self drawClickedInPlotRect:plotRect];
+
     // Draw the legend.
     [self drawLegend:plotRect];
 }
@@ -124,39 +172,65 @@
     Series *series = [_data domainSeriesForDerivative:0];
     if (series.isImplicit) {
 	// Don't draw grid for implicit series.
-	return;
+        return;
     }
-
-    NSDictionary *attr = @{
-			   NSForegroundColorAttributeName: _gridValueColor,
-			   NSFontAttributeName: _gridValueFont
-			   };
 
     Grid *grid = _data.domainGrid;
     for (GridLine *gridLine in grid.gridLines) {
-	float x = plotRect.origin.x + [grid positionFor:gridLine.value]*plotRect.size.width;
+        NSColor *color = gridLine.isZero ? _axisColor : _gridColor;
+        NSString *label = gridLine.drawLabel ? [grid gridValueLabelFor:gridLine.value isDate:series.date] : nil;
+        [self drawDomainGridLine:gridLine.value
+                       lineColor:color
+                           label:label
+                      labelColor:_gridValueColor
+            labelBackgroundColor:nil
+                       labelFont:_gridValueFont
+                            grid:grid
+                      inPlotRect:plotRect];
+    }
+}
 
-	if (gridLine.isZero) {
-	    [_axisColor set];
-	} else {
-	    [_gridColor set];
-	}
+- (void)drawDomainGridLine:(double)value
+                 lineColor:(NSColor *)lineColor
+                     label:(NSString *)label
+                labelColor:(NSColor *)labelColor
+      labelBackgroundColor:(NSColor *)labelBackgroundColor
+                 labelFont:(NSFont *)labelFont
+                      grid:(Grid *)grid
+                inPlotRect:(CGRect)plotRect {
 
-	// Draw vertical lines.
-	NSBezierPath *path = [NSBezierPath bezierPath];
-	[path moveToPoint:NSMakePoint(x, plotRect.origin.y)];
-	[path lineToPoint:NSMakePoint(x, plotRect.origin.y + plotRect.size.height)];
-	[path stroke];
+    float x = plotRect.origin.x + [grid positionForValue:value]*plotRect.size.width;
 
-	// Draw labels.
-	if (gridLine.drawLabel) {
-	    NSString *gridValueStr = [grid gridValueLabelFor:gridLine.value isDate:series.date];
-	    NSSize size = [gridValueStr sizeWithAttributes:attr];
-	    CGFloat textX = x - size.width/2;
-	    CGFloat textY = plotRect.origin.x - _gridValueFont.ascender + _gridValueFont.descender - GRID_VALUE_PADDING;
-	    NSPoint point = NSMakePoint(textX, textY);
-	    [gridValueStr drawAtPoint:point withAttributes:attr];
-	}
+    // Draw vertical line.
+    [lineColor set];
+    NSBezierPath *path = [NSBezierPath bezierPath];
+    [path moveToPoint:NSMakePoint(x, plotRect.origin.y)];
+    [path lineToPoint:NSMakePoint(x, plotRect.origin.y + plotRect.size.height)];
+    [path stroke];
+
+    // Draw label.
+    if (label != nil) {
+        NSDictionary *attr = @{
+                               NSForegroundColorAttributeName: labelColor,
+                               NSFontAttributeName: labelFont
+                               };
+
+        NSSize size = [label sizeWithAttributes:attr];
+        CGFloat textX = x - size.width/2;
+        CGFloat textY = plotRect.origin.x - labelFont.ascender + labelFont.descender - GRID_VALUE_PADDING;
+        NSPoint point = NSMakePoint(textX, textY);
+
+        if (labelBackgroundColor != nil) {
+            [labelBackgroundColor set];
+
+            CGFloat height = size.height + 2*PILL_V_PADDING;
+            CGFloat hPadding = height/2;
+            NSBezierPath *path = [NSBezierPath bezierPath];
+            [path appendBezierPathWithRoundedRect:NSMakeRect(textX - hPadding, textY - PILL_V_PADDING, size.width + 2*hPadding, height) xRadius:height/2 yRadius:height/2];
+            [path fill];
+        }
+
+        [label drawAtPoint:point withAttributes:attr];
     }
 }
 
@@ -184,7 +258,7 @@
 	GridLine *rightGridLine = [rightGrid.gridLines objectAtIndex:i];
 	GridLine *gridLine = [grid.gridLines objectAtIndex:i];
 
-	int y = plotRect.origin.y + [grid positionFor:gridLine.value]*plotRect.size.height;
+	int y = plotRect.origin.y + [grid positionForValue:gridLine.value]*plotRect.size.height;
 
 	NSColor *gridLineColor;
 	if (leftGridLine.isZero && rightGridLine.isZero) {
@@ -279,8 +353,8 @@
 	double domainValue = [domainSeries valueAt:j];
 	double value = [series valueAt:j];
 	
-	CGFloat x = plotRect.origin.x + [_data.domainGrid positionFor:domainValue]*plotRect.size.width;
-	CGFloat y = plotRect.origin.y + [rangeGrid positionFor:value]*plotRect.size.height;
+	CGFloat x = plotRect.origin.x + [_data.domainGrid positionForValue:domainValue]*plotRect.size.width;
+	CGFloat y = plotRect.origin.y + [rangeGrid positionForValue:value]*plotRect.size.height;
 	NSPoint point = NSMakePoint(x, y);
 	if (firstPoint) {
 	    firstPoint = NO;
@@ -335,6 +409,25 @@
 	    titleY -= leading;
 	}
     }
+}
+
+- (void)drawClickedInPlotRect:(CGRect)plotRect {
+    if (!_clicked) {
+        return;
+    }
+
+    Series *series = [_data domainSeriesForDerivative:0];
+    Grid *grid = _data.domainGrid;
+
+    NSString *label = [grid gridValueLabelFor:_domainClickValue isDate:series.date];
+    [self drawDomainGridLine:_domainClickValue
+                   lineColor:_axisColor
+                       label:label
+                  labelColor:_backgroundColor
+        labelBackgroundColor:_gridValueColor
+                   labelFont:_gridValueFont
+                        grid:grid
+                  inPlotRect:plotRect];
 }
 
 @end
