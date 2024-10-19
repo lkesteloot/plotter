@@ -38,6 +38,7 @@ static NSCharacterSet *TERMINATE_OPTION_CHARACTER_SET = nil;
 	_derivative = 0;
 	_log = NO;
 	_date = NO;
+        _zero = NO;
 	_isImplicit = NO;
 
 	// Initialize static objects.
@@ -85,6 +86,8 @@ static NSCharacterSet *TERMINATE_OPTION_CHARACTER_SET = nil;
 	_seriesType = other->_seriesType;
 	_derivative = other->_derivative;
 	_log = other->_log;
+        _date = other->_date;
+        _zero = other->_zero;
 	_isImplicit = other->_isImplicit;
     }
     
@@ -133,6 +136,8 @@ static NSCharacterSet *TERMINATE_OPTION_CHARACTER_SET = nil;
 		    _log = YES;
 		} else if ([option isEqualToString:@"date"]) {
 		    _date = YES;
+                } else if ([option isEqualToString:@"zero"]) {
+                    _zero = YES;
 		} else {
 		    NSLog(@"Unknown header option: %@", option);
 		}
@@ -177,7 +182,7 @@ static NSCharacterSet *TERMINATE_OPTION_CHARACTER_SET = nil;
     for (int i = 0; i < _count; i++) {
 	double value = _data[i];
 
-	if (i == 0) {
+	if (i == 0 && !_zero) {
 	    _minValue = value;
 	    _maxValue = value;
 	} else {

@@ -67,6 +67,9 @@ The options are:
   must be positive for log plots.
 - Whether to domain values should be considered to be years (`date`). This draws the
   four-digit numbers as "2018" instead of "2,018". Does not apply to ranges.
+- Whether to always show zero in the vertical axis (`zero`). For example, if the range
+  of a series is 400 to 410, then normally the vertical axis would go from 400 to 410.
+  This option will cause the vertical axis to go from 0 to 410.
 
 To actually run the binary from the command line, you'll have to add the build directory
 to your path, copy the binary to a directory already in your path, or run it

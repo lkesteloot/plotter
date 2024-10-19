@@ -40,6 +40,8 @@ typedef NS_ENUM(NSInteger, SeriesType) {
 // Whether this represents a date, and specifically a year. Causes number to not be
 // drawn with a comma ("2018" instead of "2,018").
 @property (nonatomic,readonly) BOOL date;
+// Whether to always include zero when auto-ranging vertically.
+@property (nonatomic,readonly) BOOL zero;
 // Whether the data was implicitly generated. For the domain only, if not specified
 // explicitly in the input.
 @property (nonatomic) BOOL isImplicit;
