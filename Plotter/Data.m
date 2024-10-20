@@ -51,7 +51,7 @@
 	// All letters except for "e", which might be an exponent (123e4). Also include brackets so that
 	// if the user wants to have a header that's entirely numeric, they can add empty options to force
 	// it to be recognized as a header.
-	_headerCharacterSet = [NSCharacterSet characterSetWithCharactersInString:@"abcdfghijklmnopqrstuvwxyz[]"];
+	_headerCharacterSet = [NSCharacterSet characterSetWithCharactersInString:@"ABCDFGHIJKLMNOPQRSTUVWXYZabcdfghijklmnopqrstuvwxyz[]"];
 	
 	// Currently either spaces or tabs, though we should be more robust about this.
 	_dataSeparatorCharacterSet = [NSCharacterSet characterSetWithCharactersInString:@" \t"];
