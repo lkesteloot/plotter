@@ -30,4 +30,4 @@ jobs:
           echo "filetype_parameter $filetype_parameter"
           echo "scheme $scheme"
           echo "file_to_build $file_to_build"
-          xcodebuild clean build analyze -scheme "$scheme" -"$filetype_parameter" "$file_to_build"
+          xcodebuild clean build analyze CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -scheme "$scheme" -"$filetype_parameter" "$file_to_build"
