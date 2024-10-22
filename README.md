@@ -1,10 +1,12 @@
 # Plotter
 
-Mac OS X app to plot numbers fed to it through standard input.
+Mac OS app to plot numbers fed to it through standard input.
 
 Usage:
 
-    % python example.py | Plotter
+```sh
+% python example.py | Plotter
+```
 
 The data must have one line per data point, and a data point can
 have any number of values, separated by spaces or tabs:
@@ -16,14 +18,16 @@ have any number of values, separated by spaces or tabs:
 Each column represents a series, which will be drawn horizontally in
 a plot. For example, this program (see `example.py`):
 
-    import math
+```python
+import math
 
-    print "Sine*Exp\tCosine"
+print("Sine*Exp\tCosine")
 
-    t = 0
-    while t < 20:
-        print math.sin(t)*math.exp(-t*0.1), math.cos(t)
-        t += 0.1
+t = 0
+while t < 20:
+    print(math.sin(t)*math.exp(-t*0.1), math.cos(t))
+    t += 0.1
+```
 
 generates this plot:
 
@@ -71,16 +75,15 @@ The options are:
   or domain of a series is 400 to 410, then normally its axis would go from 400
   to 410. This option will cause the axis to go from 0 to 410.
 
-To actually run the binary from the command line, you'll have to add the build directory
-to your path, copy the binary to a directory already in your path, or run it
-directly from the build directory. For me the build location is something like
-`/Users/lk/Library/Developer/Xcode/DerivedData/Plotter-btpwhghyeyiylxbuefmsxxunmfrc/Build/Products/Debug/Plotter.app/Contents/MacOS/Plotter`. I found this by temporarily adding this to
-the top of the `main()` function:
+# Building
 
-    NSLog(@"%s", argv[0]);
+To build it, run `make`. You'll find the app in `build/Plotter.app`. Copy that
+somewhere and either add its `Contents/MacOS` subdirectory to your path, or
+create an alias for the binary:
 
-and running the app in Xcode. Running the app this way hangs, since there's nothing
-on the standard input, but it'll show you its full pathname.
+```sh
+alias Plotter=$PLOTTER_APP_DIR/Contents/MacOS/Plotter
+```
 
 # License
 
