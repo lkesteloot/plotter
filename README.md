@@ -102,6 +102,14 @@ alias Plotter=$PLOTTER_APP_DIR/Contents/MacOS/Plotter
 Run `make check` to typecheck and run the tests, and `make run FILE=data.txt` to
 run without packaging.
 
+The app icon is generated procedurally by `icon/draw-icon.ts`, ported from the
+Pillow script in the Objective-C repo. It renders with the same Canvas 2D that
+draws the plots, so there's no Python or Pillow dependency.
+
+`icon/Plotter.icns` is committed, and `make app` uses it as-is rather than
+regenerating it, so building never depends on opening a window. After changing
+`icon/draw-icon.ts`, run `make icon` and commit the new `.icns`.
+
 # Source layout
 
 - `src/core/` — parsing the input, computing derivatives, and choosing grid
@@ -110,6 +118,7 @@ run without packaging.
 - `src/main/` — the Electron main process: the command line, the windows, and
   the menu.
 - `src/renderer/` — draws the plot on a canvas.
+- `icon/` — draws the app icon and packages it as an `.icns`.
 
 # Differences from the Objective-C version
 
@@ -123,6 +132,9 @@ run without packaging.
   quitting the app.
 - Several files can be given on the command line, each opening in its own window,
   and File > Open opens more.
+- The icon is regenerated from the current drawing code. The `.icns` therefore
+  includes the shadow tweak that the Objective-C app's checked-in icons, exported
+  in 2024, were missing.
 
 # License
 

@@ -11,7 +11,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "start": "npm run build && electron dist/main.js",
-    "app": "npm run build && electron-builder --mac --dir"
+    "app": "npm run build && electron-builder --mac --dir",
+    "icon": "node build.mjs && electron icon/make-icon.js"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",
@@ -25,14 +26,16 @@
     "appId": "com.headcode.plotter",
     "productName": "Plotter",
     "directories": {
-      "output": "build"
+      "output": "build",
+      "buildResources": "icon"
     },
     "files": [
       "dist/**/*"
     ],
     "mac": {
       "category": "public.app-category.developer-tools",
-      "identity": null
+      "identity": null,
+      "icon": "icon/Plotter.icns"
     }
   }
 }
