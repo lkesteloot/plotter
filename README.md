@@ -99,8 +99,7 @@ That builds the app and installs two things:
 - `~/Applications/Plotter.app`, the app itself, which you can also launch from
   the Finder or Spotlight.
 - `~/.local/bin/plotter`, a small script that runs it, so that `plotter data.txt`
-  works from any shell. Make sure `~/.local/bin` is on your `PATH`; `make
-  install` warns you if it isn't.
+  works from any shell. Make sure `~/.local/bin` is on your `PATH`.
 
 Override the destinations to install machine-wide:
 

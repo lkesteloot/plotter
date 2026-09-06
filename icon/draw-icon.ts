@@ -8,11 +8,18 @@ import { blend, type Color, rgb, toCss, WHITE } from "../src/core/colors.js";
 
 const WIDTH = 1024;
 const HEIGHT = 1024;
-const MARGIN = 120;
-const RADIUS = 50;
-const SHADOW_SIZE = 50;
-const SHADOW_OFFSET = 10;
-const SHADOW_COLOR = "rgb(128 128 128)";
+// Geometry to match the macOS app icons: an 824x824 body in a 1024x1024 canvas,
+// with corners rounded by about 23% of the width, and a small, faint shadow.
+// The radius is the circular arc that best fits the shape macOS itself draws,
+// whose corners are very slightly non-circular.
+const MARGIN = 100;
+const RADIUS = 193;
+const SHADOW_SIZE = 14;
+const SHADOW_OFFSET = 9;
+// The shadow is a little wider than the body, not just nudged down.
+const SHADOW_SPREAD = 5;
+const SHADOW_COLOR = "rgb(0 0 0)";
+const SHADOW_OPACITY = 0.19;
 const INTERNAL_WIDTH = WIDTH - 2*MARGIN;
 const INTERNAL_HEIGHT = HEIGHT - 2*MARGIN;
 const AXIS_LINE_WIDTH = 16;
@@ -61,7 +68,10 @@ function drawCurve(ctx: CanvasRenderingContext2D, fn: (x: number) => number, col
 // Draw the icon at its full size. Smaller icons are scaled down from this master
 // rather than drawn again at each size.
 function drawMaster(ctx: CanvasRenderingContext2D): void {
+    ctx.save();
+    ctx.globalAlpha = SHADOW_OPACITY;
     ctx.drawImage(makeShadow(), 0, 0);
+    ctx.restore();
 
     // Everything else is clipped to the rounded rect.
     ctx.save();
@@ -99,8 +109,9 @@ function makeShadow(): HTMLCanvasElement {
     ctx.filter = `blur(${SHADOW_SIZE}px)`;
     ctx.fillStyle = SHADOW_COLOR;
     ctx.beginPath();
-    ctx.roundRect(MARGIN, MARGIN + SHADOW_OFFSET,
-        WIDTH - MARGIN*2, HEIGHT - MARGIN*2, RADIUS);
+    ctx.roundRect(MARGIN - SHADOW_SPREAD, MARGIN + SHADOW_OFFSET - SHADOW_SPREAD,
+        WIDTH - MARGIN*2 + SHADOW_SPREAD*2, HEIGHT - MARGIN*2 + SHADOW_SPREAD*2,
+        RADIUS + SHADOW_SPREAD);
     ctx.fill();
     ctx.filter = "none";
 
