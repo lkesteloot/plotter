@@ -6,7 +6,7 @@ Usage:
 
 ```sh
 % python3 example.py > data.txt
-% Plotter data.txt
+% plotter data.txt
 ```
 
 The data must have one line per data point, and a data point can
@@ -82,21 +82,37 @@ Specify one or more filenames on the command line, each of which opens in its
 own window:
 
 ```sh
-% Plotter data.txt other.txt
+% plotter data.txt other.txt
 ```
 
 Use <kbd>&#x2318;R</kbd> (File > Reload) to re-read a file after regenerating it,
 and <kbd>&#x2318;O</kbd> (File > Open) to open more.
 
-# Building
-
-Run `make`. You'll find the app in `build/mac-arm64/Plotter.app`. Copy that
-somewhere and either add its `Contents/MacOS` subdirectory to your path, or
-create an alias for the binary:
+# Installing
 
 ```sh
-alias Plotter=$PLOTTER_APP_DIR/Contents/MacOS/Plotter
+% make install
 ```
+
+That builds the app and installs two things:
+
+- `~/Applications/Plotter.app`, the app itself, which you can also launch from
+  the Finder or Spotlight.
+- `~/.local/bin/plotter`, a small script that runs it, so that `plotter data.txt`
+  works from any shell. Make sure `~/.local/bin` is on your `PATH`; `make
+  install` warns you if it isn't.
+
+Override the destinations to install machine-wide:
+
+```sh
+% make install PREFIX=/usr/local APPDIR=/Applications
+```
+
+`make uninstall` removes both, and takes the same variables.
+
+# Building
+
+Run `make`. You'll find the app in `build/mac-arm64/Plotter.app`.
 
 Run `make check` to typecheck and run the tests, and `make run FILE=data.txt` to
 run without packaging.
