@@ -1,8 +1,8 @@
-// Draws the plot on a canvas. Ported from PlotView.m.
+// Draws the plot on a canvas.
 //
-// Cocoa's origin is at the bottom left with y going up; the canvas origin is at
-// the top left with y going down. Everything here is in canvas coordinates, so
-// values map to y with yForValue(), which does the flip.
+// The canvas origin is at the top left with y going down, while data values go
+// up. Everything here is in canvas coordinates, so values map to y with
+// yForValue(), which does the flip.
 
 import { blend, type Color, COLORS, FALLBACK_COLOR, rgb, toCss, WHITE } from "../core/colors.js";
 import { type Axis } from "../core/axis.js";
@@ -38,7 +38,7 @@ interface Rect {
     height: number;
 }
 
-// The vertical metrics of a font, in the same sense as NSFont's.
+// The vertical metrics of a font.
 interface FontMetrics {
     ascent: number;
     descent: number;

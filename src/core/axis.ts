@@ -1,4 +1,4 @@
-// A left or right vertical axis. Ported from Axis.m.
+// A left or right vertical axis.
 
 import { Grid, makeRangeGrid } from "./grid.js";
 import { type Series } from "./series.js";

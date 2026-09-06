@@ -1,5 +1,5 @@
 // The grid lines drawn behind a plot, and the mapping between data values and
-// positions along an axis. Ported from Grid.m.
+// positions along an axis.
 
 // The set of numbers that we can use for grid intervals.
 const VALID_VALUES = [1, 1.5, 2, 3, 4, 5, 6, 7.5, 8, 10];
@@ -7,8 +7,8 @@ const VALID_VALUES = [1, 1.5, 2, 3, 4, 5, 6, 7.5, 8, 10];
 // Number of lines in a range (vertical) grid.
 const RANGE_LINE_COUNT = 5;
 
-// The original used the current locale. We pin the locale so that plots and
-// tests look the same everywhere.
+// Pinned rather than following the current locale, so that plots and tests look
+// the same everywhere.
 const LOCALE = "en-US";
 
 const GROUPED_FORMAT = new Intl.NumberFormat(LOCALE, {
@@ -127,7 +127,7 @@ export class Grid {
     gridValueLabelFor(value: number, isDate: boolean): string {
         const format = isDate ? UNGROUPED_FORMAT : GROUPED_FORMAT;
 
-        // Intl formats negative zero as "-0"; the original did not.
+        // Intl formats negative zero as "-0", which looks wrong on an axis.
         return format.format(value === 0 ? 0 : value);
     }
 

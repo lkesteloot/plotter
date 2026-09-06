@@ -1,7 +1,5 @@
-// Draws the app icon procedurally. Ported from the Pillow script in the
-// Objective-C repo (icon/make_icon), so the icon is still generated rather than
-// checked in as a picture, but with no dependency beyond the one we already
-// have for drawing plots.
+// Draws the app icon procedurally, so that it's generated rather than checked in
+// as a picture, using the same Canvas 2D that draws the plots.
 //
 // Bundled as an IIFE and injected into a blank page by make-icon.ts, which is
 // how it gets a canvas to draw on.
@@ -60,8 +58,8 @@ function drawCurve(ctx: CanvasRenderingContext2D, fn: (x: number) => number, col
     ctx.stroke();
 }
 
-// Draw the icon at its full size. Smaller icons are scaled down from this, the
-// way the original generated one master image and resized it.
+// Draw the icon at its full size. Smaller icons are scaled down from this master
+// rather than drawn again at each size.
 function drawMaster(ctx: CanvasRenderingContext2D): void {
     ctx.drawImage(makeShadow(), 0, 0);
 
@@ -93,8 +91,7 @@ function drawMaster(ctx: CanvasRenderingContext2D): void {
 // The shadow: the same rounded rect, blurred and nudged downward. It's drawn on
 // its own canvas because blurring a shape blurs its color along with its alpha,
 // which leaves the gray drifting by a few levels at the edges. Compositing flat
-// gray through the blurred shape keeps the color exactly constant, which is what
-// the Pillow version did by blurring the mask alone.
+// gray through the blurred shape keeps the color exactly constant.
 function makeShadow(): HTMLCanvasElement {
     const canvas = makeCanvas(WIDTH, HEIGHT);
     const ctx = get2dContext(canvas);

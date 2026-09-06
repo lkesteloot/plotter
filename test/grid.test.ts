@@ -1,5 +1,3 @@
-// Ported from PlotterTests.m.
-
 import { describe, expect, test } from "vitest";
 import { Grid, type GridLine, makeDomainGrid, makeRangeGrid, roundDown, roundUp } from "../src/core/grid.js";
 

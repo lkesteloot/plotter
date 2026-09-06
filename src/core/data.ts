@@ -1,4 +1,4 @@
-// Parses the input file into series, axes and grids. Ported from Data.m.
+// Parses the input file into series, axes and grids.
 
 import { Axis } from "./axis.js";
 import { Grid, makeDomainGrid } from "./grid.js";

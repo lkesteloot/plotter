@@ -1,5 +1,5 @@
-// Tests for the parsing that Data and Series do. The original had no tests for
-// these; they cover the header options described in the README.
+// Tests for the parsing that Data and Series do, covering the header options
+// described in the README.
 
 import { describe, expect, test } from "vitest";
 import { Data } from "../src/core/data.js";

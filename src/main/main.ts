@@ -1,5 +1,4 @@
 // The main process: owns the command line, the windows, and the menu.
-// Replaces AppDelegate.m, ViewController.m and main.m.
 
 import { app, BrowserWindow, dialog, Menu, shell } from "electron";
 import { readFile } from "node:fs/promises";

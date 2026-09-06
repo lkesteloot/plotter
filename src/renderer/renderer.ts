@@ -1,4 +1,4 @@
-// Wires the window up to the plot. Replaces ViewController.m.
+// Wires the window up to the plot.
 
 import { Data } from "../core/data.js";
 import { Plot } from "./plot.js";

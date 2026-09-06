@@ -1,7 +1,6 @@
 # Plotter
 
-Mac OS app to plot numbers in a CSV-like file. A TypeScript and Electron port of
-the [original Objective-C version](https://github.com/lkesteloot/plotter).
+Mac OS app to plot numbers in a CSV-like file.
 
 Usage:
 
@@ -102,10 +101,6 @@ alias Plotter=$PLOTTER_APP_DIR/Contents/MacOS/Plotter
 Run `make check` to typecheck and run the tests, and `make run FILE=data.txt` to
 run without packaging.
 
-The app icon is generated procedurally by `icon/draw-icon.ts`, ported from the
-Pillow script in the Objective-C repo. It renders with the same Canvas 2D that
-draws the plots, so there's no Python or Pillow dependency.
-
 `icon/Plotter.icns` is committed, and `make app` uses it as-is rather than
 regenerating it, so building never depends on opening a window. After changing
 `icon/draw-icon.ts`, run `make icon` and commit the new `.icns`.
@@ -119,22 +114,6 @@ regenerating it, so building never depends on opening a window. After changing
   the menu.
 - `src/renderer/` — draws the plot on a canvas.
 - `icon/` — draws the app icon and packages it as an `.icns`.
-
-# Differences from the Objective-C version
-
-- Reading data from standard input is no longer supported; pass a filename.
-- Blank lines are skipped rather than counted as data points, so a trailing
-  newline no longer leaves a gap at the right edge of the plot.
-- Numbers are formatted using the `en-US` locale rather than the current one, so
-  that plots and tests look the same everywhere.
-- Naming a file that can't be read shows an error instead of an empty window.
-- A log plot with non-positive values shows a message in the window instead of
-  quitting the app.
-- Several files can be given on the command line, each opening in its own window,
-  and File > Open opens more.
-- The icon is regenerated from the current drawing code. The `.icns` therefore
-  includes the shadow tweak that the Objective-C app's checked-in icons, exported
-  in 2024, were missing.
 
 # License
 

@@ -1,5 +1,4 @@
 // A single column of numbers from the input, plus the options from its header.
-// Ported from Series.m.
 
 import { type Color, getColorByName } from "./colors.js";
 

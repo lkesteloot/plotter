@@ -1,5 +1,5 @@
-// Colors used to draw series, ported from Colors.m. Values match the AppKit
-// system colors the original used, so plots look the same as before.
+// Colors used to draw series. These are the macOS system colors; blue and purple
+// are lightened because they're too dark against the plot background.
 
 export interface Color {
     readonly r: number; // 0 to 1
@@ -11,8 +11,7 @@ export function rgb(r: number, g: number, b: number): Color {
     return { r, g, b };
 }
 
-// Mix "fraction" of "other" into "color". Equivalent to AppKit's
-// blendedColorWithFraction:ofColor:.
+// Mix "fraction" of "other" into "color".
 export function blend(color: Color, fraction: number, other: Color): Color {
     return {
         r: color.r*(1 - fraction) + other.r*fraction,
