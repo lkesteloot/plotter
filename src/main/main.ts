@@ -12,12 +12,13 @@ const BACKGROUND_COLOR = "#332e24";
 // Which file each window is showing, so File > Reload knows what to re-read.
 const filenames = new Map<number, string>();
 
-async function createWindow(filename: string | undefined): Promise<BrowserWindow> {
+// Every window shows a file; we never open an empty one.
+async function createWindow(filename: string): Promise<BrowserWindow> {
     const window = new BrowserWindow({
         width: 1000,
         height: 700,
         backgroundColor: BACKGROUND_COLOR,
-        title: filename === undefined ? "Plotter" : basename(filename),
+        title: basename(filename),
         webPreferences: {
             preload: resolve(__dirname, "preload.js"),
         },
@@ -25,10 +26,8 @@ async function createWindow(filename: string | undefined): Promise<BrowserWindow
 
     await window.loadFile(resolve(__dirname, "index.html"));
 
-    if (filename !== undefined) {
-        filenames.set(window.id, resolve(filename));
-        await loadData(window);
-    }
+    filenames.set(window.id, resolve(filename));
+    await loadData(window);
 
     window.on("closed", () => filenames.delete(window.id));
 
@@ -62,6 +61,12 @@ async function openFile(): Promise<void> {
     for (const filename of result.filePaths) {
         await createWindow(filename);
     }
+}
+
+// Whether any plot is showing. Used to decide whether there's any point in
+// staying open.
+function haveWindows(): boolean {
+    return BrowserWindow.getAllWindows().length > 0;
 }
 
 function buildMenu(): void {
@@ -119,16 +124,25 @@ app.whenReady().then(async () => {
     buildMenu();
 
     const filenames = [...filenamesFromArgv(process.argv, app.isPackaged), ...openFileQueue];
-    if (filenames.length === 0) {
-        await createWindow(undefined);
-    } else {
-        for (const filename of filenames) {
-            await createWindow(filename);
-        }
+    for (const filename of filenames) {
+        await createWindow(filename);
     }
 
     // We're usually launched from a terminal, which otherwise keeps the focus.
+    // Do this before any dialog, so that it comes up in front.
     app.focus({ steal: true });
+
+    if (!haveWindows()) {
+        // Nothing to plot, and an empty window would be useless, so go straight
+        // to the Open dialog. That's all the user could have done with it.
+        await openFile();
+
+        // They canceled the dialog, so there's nothing left to do. This matches
+        // what we do when the last window is closed.
+        if (!haveWindows()) {
+            app.quit();
+        }
+    }
 });
 
 // Don't let the plot navigate anywhere; it's a local document, not a browser.

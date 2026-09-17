@@ -88,6 +88,9 @@ own window:
 Use <kbd>&#x2318;R</kbd> (File > Reload) to re-read a file after regenerating it,
 and <kbd>&#x2318;O</kbd> (File > Open) to open more.
 
+Launching the app without a file, such as from the Finder or Spotlight, goes
+straight to the Open dialog.
+
 # Installing
 
 ```sh
