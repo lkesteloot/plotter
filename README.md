@@ -22,10 +22,7 @@ A value can also be a date, in `YYYY-MM-DD` format:
     2018-03-06 4.9 254
     ...
 
-A column of dates is normally the domain (see the `domain` option below). Its
-axis is then labeled with dates, and the grid lines land on days, weeks, months,
-or years, whichever suits the range. Dates are stored as days since 1970-01-01,
-so the derivative of a series against a date domain is its change per day.
+A column of dates is normally marked with the `domain` option (see below).
 
 Lines that aren't data, such as a log message in the middle of the file, are
 ignored.
@@ -75,22 +72,21 @@ The options are:
   default is `left`. This can be useful if the plot contains values of different units
   or vastly different ranges.
 - Whether to hide the series altogether (`hide`). This is useful if you want to omit the
-  series from the plot without modifying your program much.
+  series from the plot without modifying your data or data-generating program.
 - Whether the series should be the domain (`domain`). If this flag is specified, then the
-  series will be used for the horizontal axis, and its title (if any) is drawn below that
-  axis. If missing, the domain will implicitly be the line number (starting with 1).
+  series will be used for the horizontal axis. If missing, the domain will implicitly
+  be the line number (starting with 1).
 - Whether to display the derivative of the data (`derivative`). This can be specified multiple
   times to compute the second derivative, third derivative, and so on. For each derivative,
   the title in the legend has an apostrophe appended to it.
 - Whether to draw a log plot (`log`). This currently only works on the domain. All values
-  must be positive for log plots. Ignored for a domain of dates.
+  must be positive for log plots.
 - Whether domain values should be considered to be years (`date`). This draws the
   four-digit numbers as "2018" instead of "2,018". Does not apply to ranges, and
   has no effect on a column of `YYYY-MM-DD` dates, which are always drawn as dates.
 - Whether to always show zero in the axis (`zero`). For example, if the range
   or domain of a series is 400 to 410, then normally its axis would go from 400
-  to 410. This option will cause the axis to go from 0 to 410. Ignored for dates,
-  where zero would be 1970.
+  to 410. This option will cause the axis to go from 0 to 410.
 
 # Usage
 
@@ -101,11 +97,8 @@ own window:
 % plotter data.txt other.txt
 ```
 
-Use <kbd>&#x2318;R</kbd> (File > Reload) to re-read a file after regenerating it,
+Use <kbd>&#x2318;R</kbd> (File > Reload) to re-read a file after it has changed,
 and <kbd>&#x2318;O</kbd> (File > Open) to open more.
-
-Launching the app without a file, such as from the Finder or Spotlight, goes
-straight to the Open dialog.
 
 # Installing
 
@@ -135,9 +128,7 @@ Run `make`. You'll find the app in `build/mac-arm64/Plotter.app`.
 Run `make check` to typecheck and run the tests, and `make run FILE=data.txt` to
 run without packaging.
 
-`icon/Plotter.icns` is committed, and `make app` uses it as-is rather than
-regenerating it, so building never depends on opening a window. After changing
-`icon/draw-icon.ts`, run `make icon` and commit the new `.icns`.
+After changing `icon/draw-icon.ts`, run `make icon` and commit the new `.icns`.
 
 # Source layout
 
