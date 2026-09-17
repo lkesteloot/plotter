@@ -3,6 +3,7 @@
 
 import { describe, expect, test } from "vitest";
 import { Data } from "../src/core/data.js";
+import { parseDate } from "../src/core/dates.js";
 import { SeriesType } from "../src/core/series.js";
 import { toCss } from "../src/core/colors.js";
 
@@ -27,6 +28,30 @@ describe("parsing", () => {
 
         expect(data.seriesArray[0]!.valueAt(0)).toBe(-1500);
         expect(data.seriesArray[1]!.valueAt(0)).toBe(0.02);
+    });
+
+    test("keeps values that ran together", () => {
+        const data = Data.parse("1.5-2.5 3\n");
+
+        expect(data.seriesArray.length).toBe(3);
+        expect(data.seriesArray[0]!.valueAt(0)).toBe(1.5);
+        expect(data.seriesArray[1]!.valueAt(0)).toBe(-2.5);
+        expect(data.seriesArray[2]!.valueAt(0)).toBe(3);
+    });
+
+    test("skips lines that aren't data, rather than mining them for numbers", () => {
+        const data = Data.parse("1 2\nDone in 5 seconds\n3 4\n");
+
+        expect(data.dataPointCount).toBe(2);
+        expect(data.seriesArray.length).toBe(2);
+        expect(data.seriesArray[1]!.valueAt(1)).toBe(4);
+    });
+
+    test("skips lines with a field that isn't a number", () => {
+        const data = Data.parse("1 2\n3 N/A\n5 6\n");
+
+        expect(data.dataPointCount).toBe(2);
+        expect(data.seriesArray[0]!.valueAt(1)).toBe(5);
     });
 
     test("detects a header row", () => {
@@ -154,5 +179,53 @@ describe("derivatives", () => {
         expect(series.count).toBe(2);
         expect(series.valueAt(0)).toBe(2);
         expect(series.valueAt(1)).toBe(2);
+    });
+});
+
+describe("dates", () => {
+    test("are read as days since the epoch", () => {
+        const data = Data.parse("2018-03-05 1\n2018-03-06 2\n");
+        const series = data.seriesArray[0]!;
+
+        expect(data.dataPointCount).toBe(2);
+        expect(series.isDate).toBe(true);
+        expect(series.valueAt(0)).toBe(17595);
+        expect(series.valueAt(1)).toBe(17596);
+        expect(data.seriesArray[1]!.isDate).toBe(false);
+    });
+
+    test("a column of dates is one column", () => {
+        // The values would be three numbers each if we scanned for numbers.
+        expect(Data.parse("2018-03-05 1\n").seriesArray.length).toBe(2);
+    });
+
+    test("a column is only a date column if every value is a date", () => {
+        expect(Data.parse("2018-03-05\n2018-03-06\n").seriesArray[0]!.isDate).toBe(true);
+        expect(Data.parse("2018-03-05\n17596\n").seriesArray[0]!.isDate).toBe(false);
+        expect(Data.parse("17595\n2018-03-06\n").seriesArray[0]!.isDate).toBe(false);
+    });
+
+    test("a date domain gets a date grid", () => {
+        const data = Data.parse(
+            "Day [domain]\tValue\n2026-01-15 1\n2026-06-10 2\n2026-12-20 3\n");
+        const grid = data.domainGrid!;
+
+        expect(data.domainSeriesForDerivative(0).isDate).toBe(true);
+        expect(grid.gridLines.map((gridLine) => grid.gridValueLabelFor(gridLine.value, false)))
+            .toEqual(["2026-03", "2026-05", "2026-07", "2026-09", "2026-11"]);
+    });
+
+    test("zero does not drag a date axis back to 1970", () => {
+        const series = Data.parse("Day [domain,zero]\n2026-01-15\n2026-12-20\n").seriesArray[0]!;
+
+        expect(series.minValue).toBe(parseDate("2026-01-15"));
+    });
+
+    test("a derivative against dates is per day", () => {
+        // Ten units over the five days from the 5th to the 10th.
+        const data = Data.parse(
+            "Day [domain]\tValue [derivative]\n2018-03-05 0\n2018-03-10 10\n");
+
+        expect(data.seriesArray[1]!.valueAt(0)).toBe(2);
     });
 });

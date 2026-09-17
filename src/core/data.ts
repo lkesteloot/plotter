@@ -1,7 +1,8 @@
 // Parses the input file into series, axes and grids.
 
 import { Axis } from "./axis.js";
-import { Grid, makeDomainGrid } from "./grid.js";
+import { parseDate } from "./dates.js";
+import { Grid, makeDateDomainGrid, makeDomainGrid } from "./grid.js";
 import { Series, SeriesType } from "./series.js";
 
 // Letters we use to detect a header row. All letters except for "e", which
@@ -9,10 +10,56 @@ import { Series, SeriesType } from "./series.js";
 // entirely numeric can be forced by adding empty options.
 const HEADER_RE = /[a-df-z[\]]/i;
 
-// Any number we'd find in a data row, including exponents. Scanning for these
-// rather than splitting on whitespace means a run-together pair like "1.5-2.5"
-// still reads as two values.
+// Any number we'd find in a data row, including exponents. Only used on a field
+// that didn't parse as a whole, so that a run-together pair like "1.5-2.5", which
+// a fixed-width printf can produce, still reads as two values.
 const NUMBER_RE = /[-+]?(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?/g;
+
+// One value read from a data row.
+interface Value {
+    // Dates are days since the epoch. See dates.ts.
+    value: number;
+    isDate: boolean;
+}
+
+// Split a data row into its values, or return undefined if the line isn't data
+// at all, such as a blank line or a stray log message. We skip those lines
+// entirely rather than take the numbers out of them, which would shift every
+// column after the bad field.
+function parseDataLine(line: string): Value[] | undefined {
+    const fields = line.split(/\s+/).filter((field) => field.length > 0);
+    if (fields.length === 0) {
+        return undefined;
+    }
+
+    const values: Value[] = [];
+
+    for (const field of fields) {
+        const epochDay = parseDate(field);
+        if (epochDay !== undefined) {
+            values.push({ value: epochDay, isDate: true });
+            continue;
+        }
+
+        const value = Number(field);
+        if (isFinite(value)) {
+            values.push({ value, isDate: false });
+            continue;
+        }
+
+        // Values that ran together.
+        const numbers = field.match(NUMBER_RE);
+        if (numbers === null) {
+            return undefined;
+        }
+
+        for (const number of numbers) {
+            values.push({ value: Number(number), isDate: false });
+        }
+    }
+
+    return values;
+}
 
 // All the data we load from the input.
 export class Data {
@@ -57,10 +104,10 @@ export class Data {
             }
         }
 
-        const values = line.match(NUMBER_RE);
-        if (values === null) {
-            // Blank line. Don't create a row for it, or a trailing newline would
-            // add a phantom data point at the end of the plot.
+        const values = parseDataLine(line);
+        if (values === undefined) {
+            // Not a data row. Don't create a row for it, or a trailing newline
+            // would add a phantom data point at the end of the plot.
             return;
         }
 
@@ -68,7 +115,7 @@ export class Data {
         this.dataPointCount++;
 
         for (const value of values) {
-            this.getNextSeries().addDataPoint(Number(value));
+            this.getNextSeries().addDataPoint(value.value, value.isDate);
         }
     }
 
@@ -154,10 +201,13 @@ export class Data {
         this.leftAxis.updateStats();
         this.rightAxis.updateStats();
 
-        // Compute the domain grid lines we'll show when plotting.
+        // Compute the domain grid lines we'll show when plotting. Dates get
+        // their own grid, with lines on calendar boundaries; "log" doesn't mean
+        // anything for them.
         const domainSeries = this.derivativeDomainSeries[0]!;
-        this.domainGrid = makeDomainGrid(
-            domainSeries.minValue, domainSeries.maxValue, domainSeries.log);
+        this.domainGrid = domainSeries.isDate
+            ? makeDateDomainGrid(domainSeries.minValue, domainSeries.maxValue)
+            : makeDomainGrid(domainSeries.minValue, domainSeries.maxValue, domainSeries.log);
     }
 
     domainSeriesForDerivative(derivative: number): Series {

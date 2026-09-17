@@ -16,6 +16,20 @@ have any number of values, separated by spaces or tabs:
     1.2 4.9 254
     ...
 
+A value can also be a date, in `YYYY-MM-DD` format:
+
+    2018-03-05 5 234
+    2018-03-06 4.9 254
+    ...
+
+A column of dates is normally the domain (see the `domain` option below). Its
+axis is then labeled with dates, and the grid lines land on days, weeks, months,
+or years, whichever suits the range. Dates are stored as days since 1970-01-01,
+so the derivative of a series against a date domain is its change per day.
+
+Lines that aren't data, such as a log message in the middle of the file, are
+ignored.
+
 Each column represents a series, which will be drawn horizontally in
 a plot. For example, this program (see `example.py`):
 
@@ -69,12 +83,14 @@ The options are:
   times to compute the second derivative, third derivative, and so on. For each derivative,
   the title in the legend has an apostrophe appended to it.
 - Whether to draw a log plot (`log`). This currently only works on the domain. All values
-  must be positive for log plots.
+  must be positive for log plots. Ignored for a domain of dates.
 - Whether domain values should be considered to be years (`date`). This draws the
-  four-digit numbers as "2018" instead of "2,018". Does not apply to ranges.
+  four-digit numbers as "2018" instead of "2,018". Does not apply to ranges, and
+  has no effect on a column of `YYYY-MM-DD` dates, which are always drawn as dates.
 - Whether to always show zero in the axis (`zero`). For example, if the range
   or domain of a series is 400 to 410, then normally its axis would go from 400
-  to 410. This option will cause the axis to go from 0 to 410.
+  to 410. This option will cause the axis to go from 0 to 410. Ignored for dates,
+  where zero would be 1970.
 
 # Usage
 

@@ -1,5 +1,6 @@
 import { describe, expect, test } from "vitest";
-import { Grid, type GridLine, makeDomainGrid, makeRangeGrid, roundDown, roundUp } from "../src/core/grid.js";
+import { Grid, type GridLine, makeDateDomainGrid, makeDomainGrid, makeRangeGrid, roundDown, roundUp } from "../src/core/grid.js";
+import { parseDate } from "../src/core/dates.js";
 
 function checkGridLine(grid: Grid, index: number,
                        value: number, isZero: boolean, drawLabel: boolean, label: string): void {
@@ -116,6 +117,84 @@ describe("domain grid", () => {
 
     test("log requires positive values", () => {
         expect(() => makeDomainGrid(0, 100, true)).toThrow(/positive/);
+    });
+});
+
+describe("date domain grid", () => {
+    // The labels of the grid lines between two dates.
+    function dateLabels(from: string, to: string): string[] {
+        const grid = makeDateDomainGrid(parseDate(from)!, parseDate(to)!);
+
+        return grid.gridLines.map((gridLine) => grid.gridValueLabelFor(gridLine.value, false));
+    }
+
+    test("days", () => {
+        expect(dateLabels("2026-09-01", "2026-09-06")).toEqual([
+            "2026-09-01", "2026-09-02", "2026-09-03",
+            "2026-09-04", "2026-09-05", "2026-09-06",
+        ]);
+    });
+
+    test("several days", () => {
+        expect(dateLabels("2026-09-01", "2026-09-20")).toEqual([
+            "2026-09-01", "2026-09-04", "2026-09-07", "2026-09-10",
+            "2026-09-13", "2026-09-16", "2026-09-19",
+        ]);
+    });
+
+    test("weeks land on Mondays", () => {
+        expect(dateLabels("2026-09-01", "2026-10-15")).toEqual([
+            "2026-09-07", "2026-09-14", "2026-09-21",
+            "2026-09-28", "2026-10-05", "2026-10-12",
+        ]);
+    });
+
+    test("months land on the first", () => {
+        expect(dateLabels("2026-01-15", "2026-12-20")).toEqual([
+            "2026-03", "2026-05", "2026-07", "2026-09", "2026-11",
+        ]);
+    });
+
+    test("half years", () => {
+        expect(dateLabels("2024-01-15", "2026-12-20")).toEqual([
+            "2024-07", "2025-01", "2025-07", "2026-01", "2026-07",
+        ]);
+    });
+
+    test("years land on multiples of the step", () => {
+        expect(dateLabels("2000-06-15", "2026-12-20")).toEqual([
+            "2005", "2010", "2015", "2020", "2025",
+        ]);
+        expect(dateLabels("1900-06-15", "2026-12-20")).toEqual([
+            "1920", "1940", "1960", "1980", "2000", "2020",
+        ]);
+    });
+
+    test("centuries run off the end of the table", () => {
+        expect(dateLabels("0500-06-15", "2026-12-20")).toEqual([
+            "0600", "0800", "1000", "1200", "1400", "1600", "1800", "2000",
+        ]);
+    });
+
+    test("lines stay within the data", () => {
+        const from = parseDate("2026-01-15")!;
+        const to = parseDate("2026-12-20")!;
+        const grid = makeDateDomainGrid(from, to);
+
+        for (const gridLine of grid.gridLines) {
+            expect(gridLine.value).toBeGreaterThanOrEqual(from);
+            expect(gridLine.value).toBeLessThanOrEqual(to);
+            // Epoch day 0 is 1970, which isn't an axis.
+            expect(gridLine.isZero).toBe(false);
+        }
+    });
+
+    test("the picker snaps to a day", () => {
+        const grid = makeDateDomainGrid(parseDate("2026-01-15")!, parseDate("2026-12-20")!);
+        const epochDay = parseDate("2026-06-10")!;
+
+        expect(grid.roundDisplayedValue(epochDay + 0.4)).toBe(epochDay);
+        expect(grid.roundDisplayedValue(epochDay + 0.6)).toBe(epochDay + 1);
     });
 });
 

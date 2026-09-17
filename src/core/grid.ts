@@ -1,11 +1,47 @@
 // The grid lines drawn behind a plot, and the mapping between data values and
 // positions along an axis.
 
+import { DatePrecision, epochDayFor, formatDate, ymdFor } from "./dates.js";
+
 // The set of numbers that we can use for grid intervals.
 const VALID_VALUES = [1, 1.5, 2, 3, 4, 5, 6, 7.5, 8, 10];
 
 // Number of lines in a range (vertical) grid.
 const RANGE_LINE_COUNT = 5;
+
+// How far apart the lines of a date grid are. Short steps are a number of days;
+// longer ones are a number of months, since months and years aren't a fixed
+// number of days. A year is 12 months.
+interface DateStep {
+    unit: "day" | "month";
+    count: number;
+}
+
+function days(count: number): DateStep {
+    return { unit: "day", count };
+}
+
+function months(count: number): DateStep {
+    return { unit: "month", count };
+}
+
+// The steps we can use between the lines of a date grid, in increasing size:
+// days, weeks, months, quarters, half-years, then years. No step is much more
+// than twice the one before it, so that we never draw many more lines than we
+// wanted, since date labels are wide.
+const DATE_STEPS: readonly DateStep[] = [
+    days(1), days(2), days(3), days(5), days(7), days(14),
+    months(1), months(2), months(3), months(6),
+    months(12), months(24), months(60), months(120), months(240), months(600),
+];
+
+// The average length of a month, for comparing steps of different units. Only
+// used to choose a step; the lines themselves land on real month boundaries.
+const DAYS_PER_MONTH = 365.25/12;
+
+// 1970-01-05 was a Monday. Weekly grids are drawn on Mondays, to match the ISO
+// dates we label them with.
+const MONDAY_EPOCH_DAY = 4;
 
 // Pinned rather than following the current locale, so that plots and tests look
 // the same everywhere.
@@ -78,6 +114,9 @@ export class Grid {
     private readonly maxValue: number;
     private readonly logMinValue: number;
     private readonly logMaxValue: number;
+    // Set when the values are dates, in which case it says how much of each
+    // date the labels show.
+    private readonly datePrecision: DatePrecision | undefined;
 
     constructor(options: {
         gridLines: readonly GridLine[];
@@ -86,6 +125,7 @@ export class Grid {
         maxValue: number;
         logMinValue?: number;
         logMaxValue?: number;
+        datePrecision?: DatePrecision;
     }) {
         this.gridLines = options.gridLines;
         this.log = options.log;
@@ -93,6 +133,7 @@ export class Grid {
         this.maxValue = options.maxValue;
         this.logMinValue = options.logMinValue ?? 0;
         this.logMaxValue = options.logMaxValue ?? 0;
+        this.datePrecision = options.datePrecision;
 
         const delta = this.log
             ? this.logMaxValue - this.logMinValue
@@ -122,10 +163,14 @@ export class Grid {
         return position*(this.maxValue - this.minValue) + this.minValue;
     }
 
-    // What text to draw at this value. Dates are drawn without grouping, so
-    // that a year shows as "2018" and not "2,018".
-    gridValueLabelFor(value: number, isDate: boolean): string {
-        const format = isDate ? UNGROUPED_FORMAT : GROUPED_FORMAT;
+    // What text to draw at this value. Years are drawn without grouping, so
+    // that one shows as "2018" and not "2,018".
+    gridValueLabelFor(value: number, isYear: boolean): string {
+        if (this.datePrecision !== undefined) {
+            return formatDate(value, this.datePrecision);
+        }
+
+        const format = isYear ? UNGROUPED_FORMAT : GROUPED_FORMAT;
 
         // Intl formats negative zero as "-0", which looks wrong on an axis.
         return format.format(value === 0 ? 0 : value);
@@ -133,6 +178,11 @@ export class Grid {
 
     // Take a value and round it to a nice value given the range of this grid.
     roundDisplayedValue(value: number): number {
+        if (this.datePrecision !== undefined) {
+            // We don't plot anything finer than a day.
+            return Math.floor(value + 0.5);
+        }
+
         // Note that this uses fractionDigits, which is wrong (too low) in some
         // cases, like when the range is [0,3] it'll be zero and none of the
         // values will have fraction digits. Revisit when it causes a problem.
@@ -272,4 +322,100 @@ export function makeDomainGrid(minValue: number, maxValue: number, log: boolean)
     }
 
     return new Grid({ gridLines, log: false, minValue, maxValue });
+}
+
+// How big a step to put between the lines of a date grid covering this many
+// days. Like the numeric domain grid, we want as few lines as possible but at
+// least five, so we take the largest step that fits four times.
+function dateStepFor(range: number): DateStep {
+    // Ranges of many centuries run off the end of the table.
+    const largest = DATE_STEPS[DATE_STEPS.length - 1]!;
+    if (lengthOf(largest) <= range/4) {
+        return longDateStepFor(range);
+    }
+
+    let step = DATE_STEPS[0]!;
+
+    for (const candidate of DATE_STEPS) {
+        if (lengthOf(candidate) <= range/4) {
+            step = candidate;
+        }
+    }
+
+    return step;
+}
+
+// The step for a range longer than the table covers: one, two or five times a
+// power of ten years, whichever is the largest that fits.
+function longDateStepFor(range: number): DateStep {
+    const years = range/4/365.25;
+    const decade = Math.pow(10, Math.floor(Math.log10(years)));
+    const digit = years/decade;
+
+    const multiple = digit >= 5 ? 5 : digit >= 2 ? 2 : 1;
+
+    return months(Math.round(multiple*decade)*12);
+}
+
+// The approximate length of a step, in days.
+function lengthOf(step: DateStep): number {
+    return step.unit === "day" ? step.count : step.count*DAYS_PER_MONTH;
+}
+
+// How much of each date to show for a grid with this step. Lines a year or more
+// apart are all on January 1st, so the month and day would be noise.
+function datePrecisionFor(step: DateStep): DatePrecision {
+    if (step.unit === "day") {
+        return DatePrecision.Day;
+    }
+
+    return step.count < 12 ? DatePrecision.Month : DatePrecision.Year;
+}
+
+// Build the grid for a horizontal axis whose values are dates (as days since the
+// epoch). Like the numeric domain grid, it spans exactly the data. The lines land
+// on calendar boundaries: the first of the month for monthly and longer steps,
+// and Mondays for weekly ones.
+export function makeDateDomainGrid(minValue: number, maxValue: number): Grid {
+    const step = dateStepFor(maxValue - minValue);
+    const gridLines: GridLine[] = [];
+
+    if (step.unit === "day") {
+        // Weeks are drawn on Mondays; shorter steps just start at the first
+        // multiple of the step, which keeps them from moving as data is added.
+        const phase = step.count%7 === 0 ? MONDAY_EPOCH_DAY%step.count : 0;
+        const start = Math.ceil((minValue - phase)/step.count)*step.count + phase;
+
+        for (let value = start; value <= maxValue; value += step.count) {
+            gridLines.push({ value, isZero: false, drawLabel: true });
+        }
+    } else {
+        // Count months since year 0 so that we can align to a multiple of the
+        // step: every third month, every other January, and so on.
+        const ymd = ymdFor(minValue);
+        let month = Math.ceil((ymd.year*12 + ymd.month - 1)/step.count)*step.count;
+
+        for (;;) {
+            const year = Math.floor(month/12);
+            const value = epochDayFor(year, month - year*12 + 1, 1);
+            if (value > maxValue) {
+                break;
+            }
+
+            // The first aligned month can start before the data does.
+            if (value >= minValue) {
+                gridLines.push({ value, isZero: false, drawLabel: true });
+            }
+
+            month += step.count;
+        }
+    }
+
+    return new Grid({
+        gridLines,
+        log: false,
+        minValue,
+        maxValue,
+        datePrecision: datePrecisionFor(step),
+    });
 }
