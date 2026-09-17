@@ -13,6 +13,7 @@ import { type Series, SeriesType } from "../core/series.js";
 const MARGIN = 40;
 const GRID_VALUES_MARGIN = 40;
 const GRID_VALUE_PADDING = 10;
+const DOMAIN_TITLE_MARGIN = 24;
 const PILL_V_PADDING = 1;
 
 const LEGEND_LEADING = 20;
@@ -26,9 +27,11 @@ const AXIS_COLOR = blend(BACKGROUND_COLOR, 0.6, WHITE);
 const GRID_COLOR = blend(BACKGROUND_COLOR, 0.1, WHITE);
 const LEGEND_COLOR = blend(BACKGROUND_COLOR, 0.5, WHITE);
 const GRID_VALUE_COLOR = blend(BACKGROUND_COLOR, 0.4, WHITE);
+const DOMAIN_TITLE_COLOR = blend(BACKGROUND_COLOR, 0.5, WHITE);
 
 const LEGEND_FONT = "14px Helvetica, sans-serif";
 const GRID_VALUE_FONT = "14px Helvetica, sans-serif";
+const DOMAIN_TITLE_FONT = "14px Helvetica, sans-serif";
 
 // A rectangle in canvas coordinates.
 interface Rect {
@@ -160,6 +163,10 @@ export class Plot {
             // Leave room below the plot for the domain labels.
             rect.height -= GRID_VALUES_MARGIN;
         }
+        if (this.domainTitleFor(data) !== undefined) {
+            // And below those for the domain title.
+            rect.height -= DOMAIN_TITLE_MARGIN;
+        }
 
         return rect;
     }
@@ -196,6 +203,7 @@ export class Plot {
         const plotRect = this.getPlotRect(data);
 
         this.drawDomainGrid(data, plotRect);
+        this.drawDomainTitle(data, plotRect);
         this.drawRangeGrid(data, plotRect);
 
         this.drawSeriesInAxis(data, data.leftAxis, plotRect);
@@ -260,6 +268,38 @@ export class Plot {
                 plotRect,
             });
         }
+    }
+
+    // The title of the domain column, to label the horizontal axis, or
+    // undefined if the domain is implicit or its column has no title.
+    private domainTitleFor(data: Data): string | undefined {
+        const series = data.domainSeriesForDerivative(0);
+
+        return series.isImplicit ? undefined : series.title;
+    }
+
+    // Draw the title of the domain below its grid labels, centered on the
+    // plot (not on the window).
+    private drawDomainTitle(data: Data, plotRect: Rect): void {
+        const ctx = this.ctx;
+
+        const title = this.domainTitleFor(data);
+        if (title === undefined) {
+            return;
+        }
+
+        const metrics = this.metricsFor(DOMAIN_TITLE_FONT);
+        ctx.font = DOMAIN_TITLE_FONT;
+        ctx.textBaseline = "alphabetic";
+
+        // Sit at the bottom of the space that getPlotRect() reserved for us.
+        const width = ctx.measureText(title).width;
+        const x = plotRect.x + plotRect.width/2 - width/2;
+        const baseline = plotRect.y + plotRect.height
+            + GRID_VALUES_MARGIN + DOMAIN_TITLE_MARGIN - metrics.descent;
+
+        ctx.fillStyle = toCss(DOMAIN_TITLE_COLOR);
+        ctx.fillText(title, x, baseline);
     }
 
     // Draw one vertical line, with an optional label below the plot. The label

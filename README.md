@@ -63,8 +63,8 @@ The options are:
 - Whether to hide the series altogether (`hide`). This is useful if you want to omit the
   series from the plot without modifying your program much.
 - Whether the series should be the domain (`domain`). If this flag is specified, then the
-  series will be used for the horizontal axis. If missing, the domain will implicitly
-  be the line number (starting with 1).
+  series will be used for the horizontal axis, and its title (if any) is drawn below that
+  axis. If missing, the domain will implicitly be the line number (starting with 1).
 - Whether to display the derivative of the data (`derivative`). This can be specified multiple
   times to compute the second derivative, third derivative, and so on. For each derivative,
   the title in the legend has an apostrophe appended to it.
